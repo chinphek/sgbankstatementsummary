@@ -1,39 +1,41 @@
 package com.dreamtec.bsp;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.dreamtec.bsp.statement.BankStatementFactory;
+import com.dreamtec.bsp.statement.IBankStatement;
 
 /**
  * Bank Statement Parser Engine.<br>
- * <br>
- * Process all .csv files in the specific folder.<br>
  * 
  * @author chinphek
  */
 public class BSPEngine {
-    private static final String EXT = ".csv";
-    private File dir;
+    private final List<IBankStatement> statements = new ArrayList<IBankStatement>();
 
-    public BSPEngine(final String dirname) {
-        dir = new File(dirname);
-
-        if(dir == null || !dir.exists()) {
-            throw new IllegalArgumentException("Directory '" + dirname + "' does not exists.");
+    /**
+     * Add file into engine.<br>
+     * 
+     * @param file
+     * @return Class simple name if handler is found, else return null.
+     */
+    public String add(final File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("Input 'file' cannot be null.");
         }
 
-        if(!dir.isDirectory()) {
-            throw new IllegalArgumentException("'" + dir.getAbsolutePath() + "' exists but is not a directory.");
+        final IBankStatement statement = BankStatementFactory.getHandler(file);
+        if (statement != null) {
+            statements.add(statement);
+            return statement.getType();
         }
-
-        System.out.println("BankStatementParser Engine initialized for directory '" + dir.getAbsolutePath() + "'.");
+        
+        return null;
     }
 
     public void process() {
-        System.out.println("Searching for files with extension '" + EXT + "'.");
-        List<File> list = Utils.getFilesWithExtension(dir, EXT);
-        System.out.println("Found '" + list.size() + "' file(s) with extension '" + EXT + "'.");
-        for(File f : list) {
-            System.out.println("    " + f.getAbsolutePath());
-        }
+
     }
 }

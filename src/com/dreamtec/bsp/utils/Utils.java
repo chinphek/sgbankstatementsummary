@@ -1,4 +1,4 @@
-package com.dreamtec.bsp;
+package com.dreamtec.bsp.utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class Utils {
 
-    public static List<File> getFilesWithExtension(File dir, final String ext) {
-        
+    public static List<File> getFilesWithExtension(String dirname, final String ext) {
+        File dir = new File(dirname);
         File[] list = dir.listFiles(new FilenameFilter() {
 
 			@Override
