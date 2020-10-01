@@ -31,6 +31,8 @@ public class BankStatementParser {
                 System.out.println("        " + file.getName() + " => " + type);
             }
         }
+
+        System.out.println("    Processing statements");
         bsp.process();
 
         System.out.println("BankStatementParser ended");

@@ -5,6 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Bank statement factory.<br>
+ * 
+ * @author chinphek
+ */
 public class BankStatementFactory {
 
     public static IBankStatement getHandler(final File file) {

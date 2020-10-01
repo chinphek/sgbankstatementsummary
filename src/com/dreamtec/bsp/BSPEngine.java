@@ -29,13 +29,15 @@ public class BSPEngine {
         final IBankStatement statement = BankStatementFactory.getHandler(file);
         if (statement != null) {
             statements.add(statement);
-            return statement.getType();
+            return statement.getAccountName();
         }
         
         return null;
     }
 
     public void process() {
-
+        for(IBankStatement s : statements) {
+            s.process();
+        }
     }
 }
