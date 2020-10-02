@@ -42,6 +42,7 @@ public abstract class AbstractBankStatement implements IBankStatement {
             Transaction t;
             while((t = getNextTransaction()) != null) {
                 list.add(t);
+                System.out.println("            " + t);
             }
             System.out.println("            Found '" + list.size() + "' transaction(s).");
         } catch (FileNotFoundException e) {

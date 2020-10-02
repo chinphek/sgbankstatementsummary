@@ -3,8 +3,10 @@ package com.dreamtec.bsp.statement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
 
 import com.dreamtec.bsp.utils.ConsoleColors;
+import com.dreamtec.bsp.utils.Utils;
 
 /**
  * Handles OCBC 360 savings account.<br>
@@ -12,6 +14,9 @@ import com.dreamtec.bsp.utils.ConsoleColors;
  * @author chinphek
  */
 public class OCBC_360Savings_Statement extends AbstractBankStatement {
+    private String line = null;
+    private String[] cells = null;
+    private static final String DATE_FORMAT = "dd/MM/uuuu";
 
     public OCBC_360Savings_Statement(final File file) throws FileNotFoundException {
         super(file);
@@ -22,8 +27,15 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
     @Override
     protected void processFileHeader() {
         try {
-            final String line = br.readLine();
+            line = br.readLine();
             accountNumber = line.substring(33);
+
+            while((line = br.readLine()) != null) {
+                cells = Utils.splitCSV(line);
+                if(cells.length > 1 && Utils.isDate(cells[1], DATE_FORMAT)) {
+                    break;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -31,7 +43,41 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
     
     @Override
     protected Transaction getNextTransaction() {
-        return null;
+        if(line == null) {
+            return null;
+        }
+
+        Transaction t = new Transaction();
+        //[0]: Transaction date
+        //[1]: Value date
+        LocalDate date = Utils.toDate(cells[1], DATE_FORMAT);
+        t.setDate(date);
+        //[2]: Description
+        t.setDescription(cells[2]);
+        //[3]: Withdrawals (SGD)
+        String v3 = cells[3];
+        t.setOut(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+        //[4]: Deposits (SGD)
+        if(cells.length > 4) {
+            String v4 = cells[4];
+            t.setBalance(v4 == null || v4.isBlank() ? 0 : Utils.toAmount(v4));
+        } 
+        
+        try {
+            while ((line = br.readLine()) != null) {
+                cells = Utils.splitCSV(line);
+                if (cells.length > 1 && Utils.isDate(cells[1], "dd/MM/uuuu")) {
+                    break;
+                } else if(cells.length > 2) {
+                    t.setDescription(t.getDescription() + " " + cells[2]);
+                }
+            }
+        } catch (IOException e) {
+            line = null;
+            e.printStackTrace();
+        }
+        
+        return t;
     }
 
     
