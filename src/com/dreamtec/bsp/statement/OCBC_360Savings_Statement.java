@@ -60,7 +60,7 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
         //[4]: Deposits (SGD)
         if(cells.length > 4) {
             String v4 = cells[4];
-            t.setBalance(v4 == null || v4.isBlank() ? 0 : Utils.toAmount(v4));
+            t.setIn(v4 == null || v4.isBlank() ? 0 : Utils.toAmount(v4));
         } 
         
         try {
