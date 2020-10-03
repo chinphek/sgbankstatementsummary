@@ -3,8 +3,10 @@ package com.dreamtec.bsp.statement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
 
 import com.dreamtec.bsp.utils.ConsoleColors;
+import com.dreamtec.bsp.utils.Utils;
 
 /**
  * Handles OCBC 365 credit card statement.<br>
@@ -12,6 +14,9 @@ import com.dreamtec.bsp.utils.ConsoleColors;
  * @author chinphek
  */
 public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
+    private String line = null;
+    private String[] cells = null;
+    private static final String DATE_FORMAT = "dd/MM/uuuu";
 
     public OCBC_365CreditCard_Statement(final File file) throws FileNotFoundException {
         super(file);
@@ -22,8 +27,15 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
     @Override
     protected void processFileHeader() {
         try {
-            final String line = br.readLine();
+            line = br.readLine();
             accountNumber = "xxxx-xxxx-xxxx" + line.substring(56);
+
+            while((line = br.readLine()) != null) {
+                cells = Utils.splitCSV(line);
+                if(cells.length > 0 && Utils.isDate(cells[0], DATE_FORMAT)) {
+                    break;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -31,7 +43,38 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
 
     @Override
     protected Transaction getNextTransaction() {
-        return null;
+        if(line == null) {
+            return null;
+        }
+
+        Transaction t = new Transaction();
+        //[0]: Transaction date
+        LocalDate date = Utils.toDate(cells[0], DATE_FORMAT);
+        t.setDate(date);
+        //[1]: Description
+        t.setDescription(cells[1]);
+        //[2]: Withdrawals (SGD)
+        String v2 = cells[2];
+        t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
+        //[3]: Deposits (SGD)
+        if(cells.length > 3) {
+            String v3 = cells[3];
+            t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+        } 
+        
+        try {
+            while ((line = br.readLine()) != null) {
+                cells = Utils.splitCSV(line);
+                if (cells.length > 0 && Utils.isDate(cells[0], "dd/MM/uuuu")) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            line = null;
+            e.printStackTrace();
+        }
+        
+        return t;
     }
     
 }
