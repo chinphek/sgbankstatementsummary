@@ -1,6 +1,7 @@
 package com.dreamtec.main;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import com.dreamtec.bsp.BSPEngine;
@@ -17,10 +18,10 @@ public class BankStatementParser {
         final File dir = new File("");
         System.out.println("Current directory: '" + dir.getAbsolutePath() + "'.");
 
-        final String EXT = ".csv";
-        System.out.println("    Searching for files with extension '" + EXT + "'.");
-        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath(), EXT);
-        System.out.println("    Found '" + list.size() + "' file(s) with extension '" + EXT + "'.");
+        final List<String> EXTENSIONS = Arrays.asList(".csv", ".xls");
+        System.out.println("    Searching for files with extensions '" + EXTENSIONS + "'.");
+        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath(), EXTENSIONS);
+        System.out.println("    Found '" + list.size() + "' file(s) with extensions '" + EXTENSIONS + "'.");
 
         final BSPEngine bsp = new BSPEngine();
         for (final File file : list) {

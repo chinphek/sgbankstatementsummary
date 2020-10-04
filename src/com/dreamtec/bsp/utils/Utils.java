@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
+
 /**
  * General functions that assists with business logic, but are not specific to 
  * any business logic.
@@ -17,13 +19,18 @@ import java.util.List;
  */
 public class Utils {
 
-    public static List<File> getFilesWithExtension(String dirname, final String ext) {
+    public static List<File> getFilesWithExtension(String dirname, final List<String> extensions) {
         File dir = new File(dirname);
         File[] list = dir.listFiles(new FilenameFilter() {
 
 			@Override
 			public boolean accept(File dir, String name) {
-                return name.endsWith(ext);
+                for(String ext : extensions) {
+                    if(name.endsWith(ext)) {
+                        return true;
+                    }
+                }
+                return false;
 			}
             
         });
@@ -80,6 +87,14 @@ public class Utils {
     public static double toAmount(String s) {
         s = s.replace(",", "");
         return Double.valueOf(s);
+    }
+
+    public static String workbookStringValue(Workbook wb, int sheet, int row, int col) {
+        return wb.getSheetAt(sheet).getRow(row).getCell(col).getStringCellValue();
+    }
+
+    public static double workbookNumericValue(Workbook wb, int sheet, int row, int col) {
+        return wb.getSheetAt(sheet).getRow(row).getCell(col).getNumericCellValue();
     }
     
 }

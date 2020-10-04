@@ -1,7 +1,9 @@
 package com.dreamtec.bsp.statement;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -14,6 +16,7 @@ import com.dreamtec.bsp.utils.Utils;
  * @author chinphek
  */
 public class OCBC_360Savings_Statement extends AbstractBankStatement {
+    private BufferedReader br = null;
     private String line = null;
     private String[] cells = null;
     private static final String DATE_FORMAT = "dd/MM/uuuu";
@@ -27,6 +30,9 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
     @Override
     protected void processFileHeader() {
         try {
+            //Open the file for line by line reading
+            br = new BufferedReader(new FileReader(file));
+
             line = br.readLine();
             accountNumber = line.substring(33);
 
