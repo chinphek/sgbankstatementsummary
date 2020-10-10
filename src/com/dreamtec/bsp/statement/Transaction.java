@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
  * 
  * @author chinphek
  */
-public class Transaction {
+public class Transaction implements Comparable<Transaction> {
 	DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
     private LocalDate date;
@@ -64,6 +64,11 @@ public class Transaction {
 
 	public void setBalance(double balance) {
 		this.balance = balance;
+	}
+
+	@Override
+	public int compareTo(Transaction that) {
+		return this.date.compareTo(that.date);
 	}
 	
 }

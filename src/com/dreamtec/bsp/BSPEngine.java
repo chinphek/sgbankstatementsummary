@@ -2,10 +2,12 @@ package com.dreamtec.bsp;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.dreamtec.bsp.statement.BankStatementFactory;
 import com.dreamtec.bsp.statement.IBankStatement;
+import com.dreamtec.bsp.statement.Transaction;
 
 /**
  * Bank Statement Parser Engine.<br>
@@ -37,7 +39,8 @@ public class BSPEngine {
 
     public void process() {
         for(IBankStatement s : statements) {
-            s.process();
+            List<Transaction> transactions =  s.process();
+            Collections.sort(transactions);
         }
     }
 }
