@@ -15,12 +15,12 @@ import com.dreamtec.bsp.utils.Utils;
 public class BankStatementParser {
     public static void main(final String[] args) {
         System.out.println("BankStatementParser started");
-        final File dir = new File("");
+        File dir = new File("");
         System.out.println("Current directory: '" + dir.getAbsolutePath() + "'.");
 
         final List<String> EXTENSIONS = Arrays.asList(".csv", ".xls");
         System.out.println("    Searching for files with extensions '" + EXTENSIONS + "'.");
-        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath(), EXTENSIONS);
+        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath() + "/mystatements", EXTENSIONS);
         System.out.println("    Found '" + list.size() + "' file(s) with extensions '" + EXTENSIONS + "'.");
 
         final BSPEngine bsp = new BSPEngine();
