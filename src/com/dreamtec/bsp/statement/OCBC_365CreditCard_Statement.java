@@ -23,13 +23,10 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
 
     public OCBC_365CreditCard_Statement(final File file) throws FileNotFoundException {
         super(file);
-        accountName = ConsoleColors.RED_BRIGHT + "OCBC 365 Credit Card Statement" + ConsoleColors.RESET;
+        accountName = ConsoleColors.RED_BRIGHT + "OCBC 365 Credit Card" + ConsoleColors.RESET;
         accountType = AccountType.CREDITCARD;
         accountShortName = "OCBC 365";
-    }
 
-    @Override
-    protected void processFileHeader() {
         try {
             //Open the file for line by line reading
             br = new BufferedReader(new FileReader(file));
@@ -47,7 +44,7 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     protected Transaction getNextTransaction() {
         if(line == null) {

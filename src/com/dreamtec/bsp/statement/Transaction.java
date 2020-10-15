@@ -70,5 +70,32 @@ public class Transaction implements Comparable<Transaction> {
 	public int compareTo(Transaction that) {
 		return this.date.compareTo(that.date);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null) {
+			return false;
+		}
+
+		if(!(obj instanceof Transaction)) {
+			return super.equals(obj);
+		}
+
+		Transaction that = (Transaction) obj;
+
+		if(!this.date.equals(that.date)) {
+			return false;
+		}
+
+		if(!this.description.equals(that.description)) {
+			return false;
+		}
+
+		if(this.in != that.in || this.out != that.out || this.balance != that.balance) {
+			return false;
+		}
+
+		return true;
+	}
 	
 }

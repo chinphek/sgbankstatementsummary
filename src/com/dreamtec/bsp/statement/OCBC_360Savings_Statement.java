@@ -23,13 +23,10 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
 
     public OCBC_360Savings_Statement(final File file) throws FileNotFoundException {
         super(file);
-        accountName = ConsoleColors.RED_BRIGHT + "OCBC 360 Savings Statement" + ConsoleColors.RESET;
+        accountName = ConsoleColors.RED_BRIGHT + "OCBC 360 Savings" + ConsoleColors.RESET;
         accountType = AccountType.SAVINGS;
         accountShortName = "OCBC 360";
-    }
 
-    @Override
-    protected void processFileHeader() {
         try {
             //Open the file for line by line reading
             br = new BufferedReader(new FileReader(file));

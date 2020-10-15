@@ -26,6 +26,10 @@ public abstract class AbstractBankStatement implements IBankStatement {
         this.file = file;
     }
 
+    public String getFilename() {
+        return file.getName();
+    }
+
     @Override
 	public int compareTo(IBankStatement that) {
 		return this.accountShortName.compareTo(that.getAccountShortName());
@@ -34,10 +38,9 @@ public abstract class AbstractBankStatement implements IBankStatement {
     public List<Transaction> process() {
         List<Transaction> list = new ArrayList<>();
         
-        // Process the file header
-        System.out.println("        Processing " + accountName);
-        processFileHeader();
-        System.out.println("            Account Number: " + accountNumber);
+        System.out.println("            Processing file " + file.getName());
+        System.out.println("                Account Name: " + accountName);
+        System.out.println("                Account Number: " + accountNumber);
 
         // Process the transactions
         Transaction t;
@@ -46,12 +49,11 @@ public abstract class AbstractBankStatement implements IBankStatement {
             // System.out.println("            " + t);
             // System.out.println(t.getOut() + "\t" + t.getIn());
         }
-        System.out.println("            Found '" + list.size() + "' transaction(s).");
+        System.out.println("                Found '" + list.size() + "' transaction(s).");
 
         return list;
     }
 
-    protected abstract void processFileHeader();
     protected abstract Transaction getNextTransaction();
 
 }

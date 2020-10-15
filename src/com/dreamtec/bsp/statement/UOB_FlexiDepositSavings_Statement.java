@@ -21,13 +21,10 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
 
     public UOB_FlexiDepositSavings_Statement(File file) throws FileNotFoundException {
         super(file);
-        accountName = ConsoleColors.BLUE_BRIGHT + "UOB FlexiDeposit Savings Statement" + ConsoleColors.RESET;
+        accountName = ConsoleColors.BLUE_BRIGHT + "UOB FlexiDeposit Savings" + ConsoleColors.RESET;
         accountType = AccountType.SAVINGS;
         accountShortName = "UOB Flexi";
-    }
-
-    @Override
-    protected void processFileHeader() {
+        
         try {
             stream = new FileInputStream(file);
             wb = WorkbookFactory.create(stream);

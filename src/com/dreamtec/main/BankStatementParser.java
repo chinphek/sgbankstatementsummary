@@ -35,7 +35,7 @@ public class BankStatementParser {
             }
         }
 
-        System.out.println("    Processing statements");
+        System.out.println("    Processing Accounts");
         bsp.process();
         try {
             File summary = new File (dir.getAbsolutePath() + "/mystatements/out/summary.xlsx");

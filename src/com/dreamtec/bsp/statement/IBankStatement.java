@@ -8,6 +8,7 @@ import java.util.List;
  * @author chinphek
  */
 public interface IBankStatement extends Comparable<IBankStatement> {
+    public String getFilename();
     public String getAccountName();
     public String getAccountShortName();
     public AccountType getAccountType();
