@@ -38,11 +38,15 @@ public class BankStatementParser {
         System.out.println("    Processing statements");
         bsp.process();
         try {
-            File out_dir = new File(dir.getAbsolutePath() + "/mystatements/out");
+            File summary = new File (dir.getAbsolutePath() + "/mystatements/out/summary.xlsx");
+            System.out.println("    Saving all transactions into '" + summary.getAbsolutePath() + "'.");
+
+            File out_dir = summary.getParentFile();
             if(!out_dir.exists()) {
                 out_dir.mkdirs();
             }
-            bsp.save(dir.getAbsolutePath() + "/mystatements/out/summary.xlsx");
+            bsp.save(summary.getAbsolutePath());
+            System.out.println("        Saved successfully.");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
