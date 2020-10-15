@@ -23,6 +23,7 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
         super(file);
         accountName = ConsoleColors.BLUE_BRIGHT + "UOB FlexiDeposit Savings Statement" + ConsoleColors.RESET;
         accountType = AccountType.SAVINGS;
+        accountShortName = "UOB Flexi";
     }
 
     @Override

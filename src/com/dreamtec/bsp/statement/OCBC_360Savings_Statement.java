@@ -25,6 +25,7 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
         super(file);
         accountName = ConsoleColors.RED_BRIGHT + "OCBC 360 Savings Statement" + ConsoleColors.RESET;
         accountType = AccountType.SAVINGS;
+        accountShortName = "OCBC 360";
     }
 
     @Override

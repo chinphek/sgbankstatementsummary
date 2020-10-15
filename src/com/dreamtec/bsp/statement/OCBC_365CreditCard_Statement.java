@@ -25,6 +25,7 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
         super(file);
         accountName = ConsoleColors.RED_BRIGHT + "OCBC 365 Credit Card Statement" + ConsoleColors.RESET;
         accountType = AccountType.CREDITCARD;
+        accountShortName = "OCBC 365";
     }
 
     @Override

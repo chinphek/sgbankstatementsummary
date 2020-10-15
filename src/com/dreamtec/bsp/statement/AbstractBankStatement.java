@@ -13,16 +13,23 @@ import java.util.List;
 public abstract class AbstractBankStatement implements IBankStatement {
     protected File file;
     protected String accountName;
+    protected String accountShortName;
     protected AccountType accountType;
     protected String accountNumber = "?";
 
     public String getAccountName() { return accountName; }
     public AccountType getAccountType() { return accountType; }
+    public String getAccountShortName() { return accountShortName; }
     public String getAccountNumber() { return accountNumber; }
 
     public AbstractBankStatement(File file) throws FileNotFoundException{
         this.file = file;
     }
+
+    @Override
+	public int compareTo(IBankStatement that) {
+		return this.accountShortName.compareTo(that.getAccountShortName());
+	}
 
     public List<Transaction> process() {
         List<Transaction> list = new ArrayList<>();

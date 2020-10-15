@@ -1,6 +1,7 @@
 package com.dreamtec.main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,15 +19,16 @@ public class BankStatementParser {
         File dir = new File("");
         System.out.println("Current directory: '" + dir.getAbsolutePath() + "'.");
 
-        final List<String> EXTENSIONS = Arrays.asList(".csv", ".xls");
-        System.out.println("    Searching for files with extensions '" + EXTENSIONS + "'.");
-        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath() + "/mystatements", EXTENSIONS);
-        System.out.println("    Found '" + list.size() + "' file(s) with extensions '" + EXTENSIONS + "'.");
+        final List<File> list = getStatementFilelist();
+        if(list == null || list.size() == 0) {
+            System.out.println("    Please places statement files into folder '" + dir.getAbsolutePath()+ "'.");
+            return;
+        }
 
         final BSPEngine bsp = new BSPEngine();
         for (final File file : list) {
             final String type = bsp.add(file);
-            if(type == null) {
+            if (type == null) {
                 System.out.println("        " + file.getName() + " => No handler found.");
             } else {
                 System.out.println("        " + file.getName() + " => " + type);
@@ -35,7 +37,34 @@ public class BankStatementParser {
 
         System.out.println("    Processing statements");
         bsp.process();
+        try {
+            File out_dir = new File(dir.getAbsolutePath() + "/mystatements/out");
+            if(!out_dir.exists()) {
+                out_dir.mkdirs();
+            }
+            bsp.save(dir.getAbsolutePath() + "/mystatements/out/summary.xlsx");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("BankStatementParser ended");
+    }
+
+    /**
+     * Get list of statement files from subdirectory './mystatements'.
+     * @return
+     */
+    private static List<File> getStatementFilelist() {
+        File dir = new File(new File("").getAbsolutePath() + "/mystatements");
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        final List<String> EXTENSIONS = Arrays.asList(".csv", ".xls");
+        System.out.println("    Searching for files with extensions '" + EXTENSIONS + "'.");
+        final List<File> list = Utils.getFilesWithExtension(dir.getAbsolutePath(), EXTENSIONS);
+        System.out.println("    Found '" + list.size() + "' file(s) with extensions '" + EXTENSIONS + "'.");
+
+        return list;
     }
 }
