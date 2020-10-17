@@ -21,7 +21,7 @@ public class BankStatementParser {
 
         final List<File> list = getStatementFilelist();
         if(list == null || list.size() == 0) {
-            System.out.println("    Please places statement files into folder '" + dir.getAbsolutePath()+ "'.");
+            System.out.println("    Please place statement files into folder '" + dir.getAbsolutePath()+ "'.");
             return;
         }
 

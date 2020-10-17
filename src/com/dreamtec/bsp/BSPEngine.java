@@ -99,7 +99,7 @@ public class BSPEngine {
 
             for(int i = 1; i < list.size(); i++) {
                 List<Transaction> transactions2 = list.get(i).process();
-                System.out.println("            Combining transactions");
+                System.out.println("            Combining '" + (transactions.size() + transactions2.size()) + "' transactions");
                 transactions = combineTransactions(transactions, transactions2);
             }
 
@@ -191,16 +191,16 @@ public class BSPEngine {
                         }
                     }
                     if(!same) {
-                        System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                        System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transaction(s) on '" + date.toString() + "'. Please check manually.");
                     } else {
-                        System.out.println("                Discarded '" + daylist2.size() + "' overlapping transactions on '" + date.toString() + "'.");
+                        System.out.println("                Discarded '" + daylist2.size() + "' overlapping transaction(s) on '" + date.toString() + "'.");
                     }
                     t.addAll(daylist1);
                 } else if(daylist1.size() > daylist2.size()) {
-                    System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                    System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transaction(s) on '" + date.toString() + "'. Please check manually.");
                     t.addAll(daylist1);
                 } else {
-                    System.out.println("                WARN: Discarded '" + daylist1.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                    System.out.println("                WARN: Discarded '" + daylist1.size() + "' inconsistent overlapping transaction(s) on '" + date.toString() + "'. Please check manually.");
                     t.addAll(daylist2);
                 }
             }
@@ -223,7 +223,7 @@ public class BSPEngine {
      * @param transactions
      */
     private void addTransactionsToSheet(String sheetName, List<Transaction> transactions) {
-        System.out.println("            Adding '" + transactions.size() + "' transaction to sheet '" + sheetName + "'.");
+        System.out.println("            Adding '" + transactions.size() + "' transaction(s) to sheet '" + sheetName + "'.");
         Sheet sheet = excel.createSheet(sheetName);
         Row header = sheet.createRow(0);
         setCellStringValue(header, 0, "Month");
