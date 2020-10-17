@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.dreamtec.bsp.statement.handlers.OCBC_360Savings_Statement;
+import com.dreamtec.bsp.statement.handlers.OCBC_365CreditCard_Statement;
+import com.dreamtec.bsp.statement.handlers.UOB_FlexiDepositSavings_Statement;
 import com.dreamtec.bsp.utils.Utils;
 
 import org.apache.poi.ss.usermodel.Workbook;

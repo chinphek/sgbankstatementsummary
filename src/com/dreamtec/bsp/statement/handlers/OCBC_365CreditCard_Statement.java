@@ -1,4 +1,4 @@
-package com.dreamtec.bsp.statement;
+package com.dreamtec.bsp.statement.handlers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import com.dreamtec.bsp.statement.AbstractBankStatement;
+import com.dreamtec.bsp.statement.AccountType;
+import com.dreamtec.bsp.statement.Transaction;
 import com.dreamtec.bsp.utils.ConsoleColors;
 import com.dreamtec.bsp.utils.Utils;
 
