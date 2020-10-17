@@ -16,6 +16,7 @@ import com.dreamtec.bsp.statement.BankStatementFactory;
 import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -34,12 +35,15 @@ public class BSPEngine {
     private final Workbook excel = new XSSFWorkbook();
     private final CellStyle dateStyle = excel.createCellStyle();
     private final CellStyle monthStyle = excel.createCellStyle();
+    private final CellStyle summaryStyle = excel.createCellStyle();  
     private final List<IBankStatement> statements = new ArrayList<IBankStatement>();
 
     public BSPEngine() {
         CreationHelper createHelper = excel.getCreationHelper();
         dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MMM-yyyy"));
         monthStyle.setDataFormat(createHelper.createDataFormat().getFormat("MMM-yy"));
+        summaryStyle.setBorderTop(BorderStyle.THIN);
+        summaryStyle.setBorderBottom(BorderStyle.THIN);
     }
 
     /**
@@ -230,25 +234,63 @@ public class BSPEngine {
         setCellStringValue(header, 1, "Day");
         setCellStringValue(header, 2, "Date");
         setCellStringValue(header, 3, "Description");
-        setCellStringValue(header, 4, "In");
-        setCellStringValue(header, 5, "Out");
+        setCellStringValue(header, 4, "Out");
+        setCellStringValue(header, 5, "In");
         setCellStringValue(header, 6, "Balance");
 
         if (transactions != null) {
             Collections.sort(transactions);
 
+            int rowIndex = 3;
+            LocalDate curMonth = null;
+            int rowIndexCurMonth = -1;
             for (int i = 0; i < transactions.size(); i++) {
                 Transaction t = transactions.get(i);
-                Row row = sheet.createRow(i + 1);
 
+                LocalDate month = t.getDate().withDayOfMonth(1);
+
+                if(curMonth == null) {
+                    curMonth = month;
+                    rowIndexCurMonth = rowIndex + 1;
+                } else if(!curMonth.isEqual(month)) {
+                    //Summarizes the transactions for the current month.
+                    Row row = sheet.createRow(rowIndex);
+                    setCellMonthValue(row, 0, curMonth);
+                    setCellStringValue(row, 1, "");
+                    setCellStringValue(row, 2, "");
+                    setCellStringValue(row, 3, "");
+                    setCellFormula(row, 4, "sum(E" + rowIndexCurMonth + ":E" + (rowIndex) + ")");
+                    setCellFormula(row, 5, "sum(F" + rowIndexCurMonth + ":F" + (rowIndex) + ")");
+                    setCellFormula(row, 6, "G" + (rowIndexCurMonth - 2) + "+E" + (rowIndex + 1) + "-F" + (rowIndex + 1));
+                    setSummaryRowBorders(row);
+
+                    rowIndex += 2;
+                    curMonth = month;
+                    rowIndexCurMonth = rowIndex + 1;
+                }
+
+                // Add 1 row of transaction
+                Row row = sheet.createRow(rowIndex);
                 setCellMonthValue(row, 0, t.getDate());
                 setCellNumericValue(row, 1, t.getDate().getDayOfMonth());
                 setCellDateValue(row, 2, t.getDate());
                 setCellStringValue(row, 3, t.getDescription());
-                setCellNumericValue(row, 4, t.getIn());
-                setCellNumericValue(row, 5, t.getOut());
+                setCellNumericValue(row, 4, t.getOut());
+                setCellNumericValue(row, 5, t.getIn());
                 setCellNumericValue(row, 6, t.getBalance());
+                rowIndex++;
             }
+
+            //Summarizes the transactions for the current month.
+            Row row = sheet.createRow(rowIndex);
+            setCellMonthValue(row, 0, curMonth);
+            setCellStringValue(row, 1, "");
+            setCellStringValue(row, 2, "");
+            setCellStringValue(row, 3, "");
+            setCellFormula(row, 4, "sum(E" + rowIndexCurMonth + ":E" + (rowIndex) + ")");
+            setCellFormula(row, 5, "sum(F" + rowIndexCurMonth + ":F" + (rowIndex) + ")");
+            setCellFormula(row, 6, "G" + (rowIndexCurMonth - 2) + "-E" + (rowIndex + 1) + "+F" + (rowIndex + 1));
+            setSummaryRowBorders(row);
         }
 
         sheet.autoSizeColumn(0);
@@ -280,6 +322,22 @@ public class BSPEngine {
     private void setCellNumericValue(Row row, int col, double value) {
         Cell cell = row.createCell(col, CellType.NUMERIC);
         cell.setCellValue(value);
+    }
+
+    private void setCellFormula(Row row, int col, String formula) {
+        Cell cell = row.createCell(col, CellType.FORMULA);
+        cell.setCellFormula(formula);
+    }
+
+    private void setSummaryRowBorders(Row row) {
+        for(int i = 0; i < 7; i++) {
+            Cell cell = row.getCell(i);
+            CellStyle style = excel.createCellStyle();
+            style.cloneStyleFrom(cell.getCellStyle());
+            style.setBorderTop(BorderStyle.THIN);
+            style.setBorderBottom(BorderStyle.THIN);
+            cell.setCellStyle(style);
+        }
     }
 
 }
