@@ -62,11 +62,20 @@ public class BSPEngine {
         return null;
     }
 
+    /**
+     * Process all statement files added to the engine,
+     * provided a handler is found for that statement file.<br>
+     * <br>
+     * Statement files are grouped together if they belong to the same account.
+     * Transaction records in each statement file are parsed and converted into
+     * a common Transaction Java object. Transactions from multiple files are
+     * combined and overlapping transactions are discarded.
+     */
     public void process() {
         // Sort the statements
         Collections.sort(statements);
 
-        // Handle same accounts with multiple statements
+        // Loop through all statements and group together if they belongs to the same account
         Map<String, List<IBankStatement>> mapAccounts = new HashMap<String, List<IBankStatement>>();
         for (IBankStatement s : statements) {
             String key = s.getAccountShortName() + " " + s.getAccountNumber();
@@ -79,6 +88,8 @@ public class BSPEngine {
             }
         }
 
+        // Loop through all accounts and get the list of transactions within.
+        // Combine transactions if acccount has multiple statements.
         for (Entry<String, List<IBankStatement>> e : mapAccounts.entrySet()) {
             System.out.println("        Processing " + e.getKey());
             List<Transaction> transactions = null;
@@ -96,6 +107,11 @@ public class BSPEngine {
         }
     }
 
+    /**
+     * Save workbook to a file.<br>
+     * @param filename
+     * @throws FileNotFoundException
+     */
     public void save(String filename) throws FileNotFoundException {
         FileOutputStream outputStream = new FileOutputStream(filename);
         try {
@@ -105,6 +121,23 @@ public class BSPEngine {
         }
     }
 
+    /**
+     * Combine transactions from 2 different list.<br>
+     * <br>
+     * Transactions are combined in chronological order with the earlist transaction first.
+     * One use case is for statements that are downloaded on a monthly basis.
+     * The algorithm works easily when there are no overlapping transactions. In the event of overlapping
+     * transactions, it is handled on a day to to day basis. Usually when transactions are exported
+     * from the online banking website, it will contain all transactions for that day. Hence, even
+     * when transactions are overlapping in multiple statements, the same transactions for that day
+     * is expected to appear in each statement. Informtion is provided on the number of overlapping 
+     * transaction discarded. In the event that transactions for that day are inconsistent, a warning
+     * will be provided. In either cases, it is recommended for users to check the transactions manually
+     * 
+     * @param list1
+     * @param list2
+     * @return
+     */
     private List<Transaction> combineTransactions(List<Transaction> list1, List<Transaction> list2) {
         //If either list is empty, no need to combine.
         if(list1.size() == 0) {
@@ -135,8 +168,6 @@ public class BSPEngine {
                 t2 = (i2 < list2.size()) ? list2.get(i2) : null;
             } else {
                 LocalDate date = t1.getDate();
-                System.out.println("                WARN: Transactions for same date '" + date.toString() + "' found in multple statements. Please avoid overlapping statements.");
-                
                 List<Transaction> daylist1 = new ArrayList<Transaction>();
                 while(t1 != null && t1.getDate().isEqual(date)) {
                     daylist1.add(t1);
@@ -160,17 +191,16 @@ public class BSPEngine {
                         }
                     }
                     if(!same) {
-                        System.out.println("                ERROR: Inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                        System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                    } else {
+                        System.out.println("                Discarded '" + daylist2.size() + "' overlapping transactions on '" + date.toString() + "'.");
                     }
-                    System.out.println("                WARN: Discarding '" + daylist2.size() + "' overlapping transactions on '" + date.toString() + "'. Please check manually.");
                     t.addAll(daylist1);
                 } else if(daylist1.size() > daylist2.size()) {
-                    System.out.println("                ERROR: Inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
-                    System.out.println("                WARN: Discarding '" + daylist2.size() + "' overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                    System.out.println("                WARN: Discarded '" + daylist2.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
                     t.addAll(daylist1);
                 } else {
-                    System.out.println("                ERROR: Inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
-                    System.out.println("                WARN: Discarding '" + daylist1.size() + "' overlapping transactions on '" + date.toString() + "'. Please check manually.");
+                    System.out.println("                WARN: Discarded '" + daylist1.size() + "' inconsistent overlapping transactions on '" + date.toString() + "'. Please check manually.");
                     t.addAll(daylist2);
                 }
             }
@@ -187,6 +217,11 @@ public class BSPEngine {
         return t;
     }
 
+    /**
+     * Add transactions to a workbook sheet.<br>
+     * @param sheetName
+     * @param transactions
+     */
     private void addTransactionsToSheet(String sheetName, List<Transaction> transactions) {
         System.out.println("            Adding '" + transactions.size() + "' transaction to sheet '" + sheetName + "'.");
         Sheet sheet = excel.createSheet(sheetName);
