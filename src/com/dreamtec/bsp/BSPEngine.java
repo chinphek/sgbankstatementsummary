@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,7 +80,7 @@ public class BSPEngine {
         Collections.sort(statements);
 
         // Loop through all statements and group together if they belongs to the same account
-        Map<String, List<IBankStatement>> mapAccounts = new HashMap<String, List<IBankStatement>>();
+        Map<String, List<IBankStatement>> mapAccounts = new LinkedHashMap<String, List<IBankStatement>>();
         for (IBankStatement s : statements) {
             String key = s.getAccountShortName() + " " + s.getAccountNumber();
             if (mapAccounts.containsKey(key)) {
