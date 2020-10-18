@@ -16,12 +16,8 @@ import com.dreamtec.bsp.bean.MonthlySummary;
 import com.dreamtec.bsp.statement.BankStatementFactory;
 import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
+import com.dreamtec.bsp.utils.ExcelUtil;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -34,18 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class BSPEngine {
     private final Workbook excel = new XSSFWorkbook();
-    private final CellStyle dateStyle = excel.createCellStyle();
-    private final CellStyle monthStyle = excel.createCellStyle();
-    private final CellStyle summaryStyle = excel.createCellStyle();  
     private final List<IBankStatement> statements = new ArrayList<IBankStatement>();
-
-    public BSPEngine() {
-        CreationHelper createHelper = excel.getCreationHelper();
-        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MMM-yyyy"));
-        monthStyle.setDataFormat(createHelper.createDataFormat().getFormat("MMM-yy"));
-        summaryStyle.setBorderTop(BorderStyle.THIN);
-        summaryStyle.setBorderBottom(BorderStyle.THIN);
-    }
 
     /**
      * Add file into engine.<br>
@@ -94,7 +79,6 @@ public class BSPEngine {
         }
 
         // List of monthly summaries
-        excel.createSheet("Summary");
         List<MonthlySummary> listSummaries = new ArrayList<MonthlySummary>();
 
         // Loop through all accounts and get the list of transactions within.
@@ -115,6 +99,9 @@ public class BSPEngine {
             List<MonthlySummary> s = addTransactionsToSheet(e.getKey(), transactions);
             listSummaries.addAll(s);
         }
+
+        //Add summary sheet
+        SummarySheetHelper.addSummarySheetToWorkbook(excel, listSummaries);
     }
 
     /**
@@ -240,13 +227,13 @@ public class BSPEngine {
 
         Sheet sheet = excel.createSheet(sheetName);
         Row header = sheet.createRow(0);
-        setCellStringValue(header, 0, "Month");
-        setCellStringValue(header, 1, "Day");
-        setCellStringValue(header, 2, "Date");
-        setCellStringValue(header, 3, "Description");
-        setCellStringValue(header, 4, "Out");
-        setCellStringValue(header, 5, "In");
-        setCellStringValue(header, 6, "Balance");
+        ExcelUtil.setCellStringValue(header, 0, "Month");
+        ExcelUtil.setCellStringValue(header, 1, "Day");
+        ExcelUtil.setCellStringValue(header, 2, "Date");
+        ExcelUtil.setCellStringValue(header, 3, "Description");
+        ExcelUtil.setCellStringValue(header, 4, "Out");
+        ExcelUtil.setCellStringValue(header, 5, "In");
+        ExcelUtil.setCellStringValue(header, 6, "Balance");
 
         if (transactions != null) {
             Collections.sort(transactions);
@@ -274,13 +261,13 @@ public class BSPEngine {
 
                 // Add 1 row of transaction
                 Row row = sheet.createRow(rowIndex);
-                setCellMonthValue(row, 0, t.getDate());
-                setCellNumericValue(row, 1, t.getDate().getDayOfMonth());
-                setCellDateValue(row, 2, t.getDate());
-                setCellStringValue(row, 3, t.getDescription());
-                setCellNumericValue(row, 4, t.getOut());
-                setCellNumericValue(row, 5, t.getIn());
-                setCellNumericValue(row, 6, t.getBalance());
+                ExcelUtil.setCellMonthValue(row, 0, t.getDate());
+                ExcelUtil.setCellNumericValue(row, 1, t.getDate().getDayOfMonth());
+                ExcelUtil.setCellDateValue(row, 2, t.getDate());
+                ExcelUtil.setCellStringValue(row, 3, t.getDescription());
+                ExcelUtil.setCellNumericValue(row, 4, t.getOut());
+                ExcelUtil.setCellNumericValue(row, 5, t.getIn());
+                ExcelUtil.setCellNumericValue(row, 6, t.getBalance());
                 rowIndex++;
             }
 
@@ -303,14 +290,14 @@ public class BSPEngine {
     private MonthlySummary addSummayToSheet(Sheet sheet, LocalDate month, int rowStart, int rowEnd) {
         // Add summary to excel sheet
         Row row = sheet.createRow(rowEnd);
-        setCellMonthValue(row, 0, month);
-        setCellStringValue(row, 1, "");
-        setCellStringValue(row, 2, "");
-        setCellStringValue(row, 3, "");
-        setCellFormula(row, 4, "sum(E" + rowStart + ":E" + rowEnd + ")");
-        setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
-        setCellFormula(row, 6, "G" + (rowStart - 2) + "-E" + (rowEnd + 1) + "+F" + (rowEnd + 1));
-        setSummaryRowBorders(row);
+        ExcelUtil.setCellMonthValue(row, 0, month);
+        ExcelUtil.setCellStringValue(row, 1, "");
+        ExcelUtil.setCellStringValue(row, 2, "");
+        ExcelUtil.setCellStringValue(row, 3, "");
+        ExcelUtil.setCellFormula(row, 4, "sum(E" + rowStart + ":E" + rowEnd + ")");
+        ExcelUtil.setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
+        ExcelUtil.setCellFormula(row, 6, "G" + (rowStart - 2) + "-E" + (rowEnd + 1) + "+F" + (rowEnd + 1));
+        ExcelUtil.setSummaryRowBorders(row, 7);
 
         // return MonthlySummary object that contains reference to the above summary
         MonthlySummary s = new MonthlySummary();
@@ -321,43 +308,4 @@ public class BSPEngine {
         s.setRefBalance("'" + sheet.getSheetName() + "'!G" + (rowEnd + 1));
         return s;
     }
-
-    private void setCellMonthValue(Row row, int col, LocalDate value) {
-        Cell cell = row.createCell(col, CellType.STRING);
-        cell.setCellValue(value.withDayOfMonth(1));
-        cell.setCellStyle(monthStyle);
-    }
-
-    private void setCellDateValue(Row row, int col, LocalDate value) {
-        Cell cell = row.createCell(col, CellType.STRING);
-        cell.setCellValue(value);
-        cell.setCellStyle(dateStyle);
-    }
-
-    private void setCellStringValue(Row row, int col, String value) {
-        Cell cell = row.createCell(col, CellType.STRING);
-        cell.setCellValue(value);
-    }
-
-    private void setCellNumericValue(Row row, int col, double value) {
-        Cell cell = row.createCell(col, CellType.NUMERIC);
-        cell.setCellValue(value);
-    }
-
-    private void setCellFormula(Row row, int col, String formula) {
-        Cell cell = row.createCell(col, CellType.FORMULA);
-        cell.setCellFormula(formula);
-    }
-
-    private void setSummaryRowBorders(Row row) {
-        for(int i = 0; i < 7; i++) {
-            Cell cell = row.getCell(i);
-            CellStyle style = excel.createCellStyle();
-            style.cloneStyleFrom(cell.getCellStyle());
-            style.setBorderTop(BorderStyle.THIN);
-            style.setBorderBottom(BorderStyle.THIN);
-            cell.setCellStyle(style);
-        }
-    }
-
 }

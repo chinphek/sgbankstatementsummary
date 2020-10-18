@@ -51,7 +51,12 @@ public class MonthlySummary implements Comparable<MonthlySummary>{
 
     @Override
     public int compareTo(MonthlySummary that) {
+        int res = this.month.compareTo(that.month);
+        if(res == 0) {
+            return this.accountKey.compareTo(that.accountKey);
+        }
+
         return this.month.compareTo(that.month);
     }
-    
+
 }
