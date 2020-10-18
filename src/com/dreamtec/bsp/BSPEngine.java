@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.dreamtec.bsp.bean.MonthlySummary;
 import com.dreamtec.bsp.statement.BankStatementFactory;
 import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
@@ -92,6 +93,10 @@ public class BSPEngine {
             }
         }
 
+        // List of monthly summaries
+        excel.createSheet("Summary");
+        List<MonthlySummary> listSummaries = new ArrayList<MonthlySummary>();
+
         // Loop through all accounts and get the list of transactions within.
         // Combine transactions if acccount has multiple statements.
         for (Entry<String, List<IBankStatement>> e : mapAccounts.entrySet()) {
@@ -107,7 +112,8 @@ public class BSPEngine {
                 transactions = combineTransactions(transactions, transactions2);
             }
 
-            addTransactionsToSheet(e.getKey(), transactions);
+            List<MonthlySummary> s = addTransactionsToSheet(e.getKey(), transactions);
+            listSummaries.addAll(s);
         }
     }
 
@@ -225,9 +231,13 @@ public class BSPEngine {
      * Add transactions to a workbook sheet.<br>
      * @param sheetName
      * @param transactions
+     * @return list of monthly summaries
      */
-    private void addTransactionsToSheet(String sheetName, List<Transaction> transactions) {
+    private List<MonthlySummary> addTransactionsToSheet(String sheetName, List<Transaction> transactions) {
         System.out.println("            Adding '" + transactions.size() + "' transaction(s) to sheet '" + sheetName + "'.");
+
+        List<MonthlySummary> listSummaries = new ArrayList<MonthlySummary>();
+
         Sheet sheet = excel.createSheet(sheetName);
         Row header = sheet.createRow(0);
         setCellStringValue(header, 0, "Month");
@@ -254,16 +264,9 @@ public class BSPEngine {
                     rowIndexCurMonth = rowIndex + 1;
                 } else if(!curMonth.isEqual(month)) {
                     //Summarizes the transactions for the current month.
-                    Row row = sheet.createRow(rowIndex);
-                    setCellMonthValue(row, 0, curMonth);
-                    setCellStringValue(row, 1, "");
-                    setCellStringValue(row, 2, "");
-                    setCellStringValue(row, 3, "");
-                    setCellFormula(row, 4, "sum(E" + rowIndexCurMonth + ":E" + (rowIndex) + ")");
-                    setCellFormula(row, 5, "sum(F" + rowIndexCurMonth + ":F" + (rowIndex) + ")");
-                    setCellFormula(row, 6, "G" + (rowIndexCurMonth - 2) + "+E" + (rowIndex + 1) + "-F" + (rowIndex + 1));
-                    setSummaryRowBorders(row);
-
+                    MonthlySummary s = addSummayToSheet(sheet, curMonth, rowIndexCurMonth, rowIndex);
+                    listSummaries.add(s);
+                    
                     rowIndex += 2;
                     curMonth = month;
                     rowIndexCurMonth = rowIndex + 1;
@@ -282,15 +285,8 @@ public class BSPEngine {
             }
 
             //Summarizes the transactions for the current month.
-            Row row = sheet.createRow(rowIndex);
-            setCellMonthValue(row, 0, curMonth);
-            setCellStringValue(row, 1, "");
-            setCellStringValue(row, 2, "");
-            setCellStringValue(row, 3, "");
-            setCellFormula(row, 4, "sum(E" + rowIndexCurMonth + ":E" + (rowIndex) + ")");
-            setCellFormula(row, 5, "sum(F" + rowIndexCurMonth + ":F" + (rowIndex) + ")");
-            setCellFormula(row, 6, "G" + (rowIndexCurMonth - 2) + "-E" + (rowIndex + 1) + "+F" + (rowIndex + 1));
-            setSummaryRowBorders(row);
+            MonthlySummary s = addSummayToSheet(sheet, curMonth, rowIndexCurMonth, rowIndex);
+            listSummaries.add(s);
         }
 
         sheet.autoSizeColumn(0);
@@ -300,6 +296,30 @@ public class BSPEngine {
         sheet.autoSizeColumn(4);
         sheet.autoSizeColumn(5);
         sheet.autoSizeColumn(6);
+
+        return listSummaries;
+    }
+
+    private MonthlySummary addSummayToSheet(Sheet sheet, LocalDate month, int rowStart, int rowEnd) {
+        // Add summary to excel sheet
+        Row row = sheet.createRow(rowEnd);
+        setCellMonthValue(row, 0, month);
+        setCellStringValue(row, 1, "");
+        setCellStringValue(row, 2, "");
+        setCellStringValue(row, 3, "");
+        setCellFormula(row, 4, "sum(E" + rowStart + ":E" + rowEnd + ")");
+        setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
+        setCellFormula(row, 6, "G" + (rowStart - 2) + "-E" + (rowEnd + 1) + "+F" + (rowEnd + 1));
+        setSummaryRowBorders(row);
+
+        // return MonthlySummary object that contains reference to the above summary
+        MonthlySummary s = new MonthlySummary();
+        s.setAccountKey(sheet.getSheetName());
+        s.setMonth(month);
+        s.setRefOut("'" + sheet.getSheetName() + "'!E" + (rowEnd + 1));
+        s.setRefIn("'" + sheet.getSheetName() + "'!F" + (rowEnd + 1));
+        s.setRefBalance("'" + sheet.getSheetName() + "'!G" + (rowEnd + 1));
+        return s;
     }
 
     private void setCellMonthValue(Row row, int col, LocalDate value) {
