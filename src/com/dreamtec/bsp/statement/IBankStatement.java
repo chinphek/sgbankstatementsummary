@@ -9,9 +9,9 @@ import java.util.List;
  */
 public interface IBankStatement extends Comparable<IBankStatement> {
     public String getFilename();
-    public String getAccountName();
-    public String getAccountShortName();
     public AccountType getAccountType();
+    public String getAccountName();
     public String getAccountNumber();
+    public String getAccountKey();
     public List<Transaction> process();
 }

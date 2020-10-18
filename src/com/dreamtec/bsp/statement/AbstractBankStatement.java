@@ -12,18 +12,19 @@ import java.util.List;
  */
 public abstract class AbstractBankStatement implements IBankStatement {
     protected File file;
-    protected String accountName;
-    protected String accountShortName;
     protected AccountType accountType;
-    protected String accountNumber = "?";
+    protected String accountName;
+    protected String accountNumber;
+    protected String accountKey;
 
-    public String getAccountName() { return accountName; }
     public AccountType getAccountType() { return accountType; }
-    public String getAccountShortName() { return accountShortName; }
+    public String getAccountName() { return accountName; }
     public String getAccountNumber() { return accountNumber; }
+    public String getAccountKey() { return accountKey; }
 
     public AbstractBankStatement(File file) throws FileNotFoundException{
         this.file = file;
+        processFileHeader();
     }
 
     public String getFilename() {
@@ -32,10 +33,12 @@ public abstract class AbstractBankStatement implements IBankStatement {
 
     @Override
 	public int compareTo(IBankStatement that) {
-		return this.accountShortName.compareTo(that.getAccountShortName());
+		return this.accountKey.compareTo(that.getAccountKey());
 	}
 
     public List<Transaction> process() {
+        processFileHeader();
+
         List<Transaction> list = new ArrayList<>();
         
         System.out.println("            Processing file " + file.getName());
@@ -45,6 +48,7 @@ public abstract class AbstractBankStatement implements IBankStatement {
         // Process the transactions
         Transaction t;
         while ((t = getNextTransaction()) != null) {
+            t.setAccountkey(getAccountKey());
             list.add(t);
             // System.out.println("            " + t);
             // System.out.println(t.getOut() + "\t" + t.getIn());
@@ -54,6 +58,7 @@ public abstract class AbstractBankStatement implements IBankStatement {
         return list;
     }
 
+    protected abstract void processFileHeader();
     protected abstract Transaction getNextTransaction();
 
 }

@@ -82,7 +82,7 @@ public class BSPEngine {
         // Loop through all statements and group together if they belongs to the same account
         Map<String, List<IBankStatement>> mapAccounts = new LinkedHashMap<String, List<IBankStatement>>();
         for (IBankStatement s : statements) {
-            String key = s.getAccountShortName() + " " + s.getAccountNumber();
+            String key = s.getAccountKey();
             if (mapAccounts.containsKey(key)) {
                 mapAccounts.get(key).add(s);
             } else {

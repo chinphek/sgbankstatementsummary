@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class Transaction implements Comparable<Transaction> {
 	DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
+	private String accountKey;
     private LocalDate date;
     private String description;
     private double out;
@@ -19,11 +20,20 @@ public class Transaction implements Comparable<Transaction> {
 	
 	@Override
 	public String toString() {
-		return date.format(dateFormatter)
+		return accountKey
+		+ "," + date.format(dateFormatter)
 		+ "," + description
 		+ "," + out
 		+ "," + in
 		+ "," + balance;
+	}
+
+	public String getAccountKey() {
+		return accountKey;
+	}
+
+	public void setAccountkey(String accountKey) {
+		this.accountKey = accountKey;
 	}
 
 	public LocalDate getDate() {
@@ -82,6 +92,10 @@ public class Transaction implements Comparable<Transaction> {
 		}
 
 		Transaction that = (Transaction) obj;
+
+		if(!this.accountKey.equals(that.accountKey)) {
+			return false;
+		}
 
 		if(!this.date.equals(that.date)) {
 			return false;
