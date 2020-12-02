@@ -37,7 +37,9 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
 
             accountNumber = Utils.workbookStringValue(wb, 0, 4, 1);
             sheet = 0;
-            row = 8;
+            // For UOB, the latest transactions are at the top.
+            // The first transaction is at the last row.
+            row = wb.getSheetAt(sheet).getLastRowNum();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -49,7 +51,8 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
 
     @Override
     protected Transaction getNextTransaction() {
-        if(row > wb.getSheetAt(sheet).getLastRowNum()) {
+        // Row 8 is the latest transaction
+        if(row < 8) {
             return null;
         }
 
@@ -65,7 +68,7 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
         t.setIn(Utils.workbookNumericValue(wb, sheet, row, 3));
         //[4]: Available Balance
         t.setBalance(Utils.workbookNumericValue(wb, sheet, row, 4));
-        row++;
+        row--;
         return t;
     }
     
