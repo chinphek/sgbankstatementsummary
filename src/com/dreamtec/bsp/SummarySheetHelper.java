@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import com.dreamtec.bsp.bean.MonthlySummary;
 import com.dreamtec.bsp.utils.ExcelUtil;
 
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -70,6 +71,11 @@ public class SummarySheetHelper {
 
             rowIndex++;
         }
+
+        FormulaEvaluator e = excel.getCreationHelper().createFormulaEvaluator();
+        e.evaluateAll();
+
+        sheet.setZoom(150);
 
         sheet.autoSizeColumn(0);
         sheet.setColumnWidth(1, 12 * 256);

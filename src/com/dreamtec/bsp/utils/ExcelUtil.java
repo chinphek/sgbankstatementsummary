@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -148,10 +147,6 @@ public class ExcelUtil {
 
         //Set style
         cell.setCellStyle(styleAmount);
-
-        // Evaluate formula
-        FormulaEvaluator e = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
-        e.evaluate(cell);
     }
 
     public void setSummaryRowBorders(Row row, int count) {

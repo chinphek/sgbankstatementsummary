@@ -18,6 +18,7 @@ import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
 import com.dreamtec.bsp.utils.ExcelUtil;
 
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -299,6 +300,11 @@ public class BSPEngine {
             MonthlySummary s = addSummayToSheet(sheet, curMonth, rowIndexCurMonth, rowIndex);
             listSummaries.add(s);
         }
+
+        FormulaEvaluator e = excel.getCreationHelper().createFormulaEvaluator();
+        e.evaluateAll();
+
+        sheet.setZoom(150);
 
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);
