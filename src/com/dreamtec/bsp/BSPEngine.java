@@ -228,10 +228,10 @@ public class BSPEngine {
         Sheet sheet = excel.createSheet(sheetName);
 
         Row header = sheet.createRow(0);
-        ExcelUtil.setCellStringValue(header, 0, "Date");
-        ExcelUtil.setCellStringValue(header, 1, "Month");
-        ExcelUtil.setCellStringValue(header, 2, "Day");
-        ExcelUtil.setCellStringValue(header, 3, "Type");
+        ExcelUtil.setCellStringValueCenter(header, 0, "Date");
+        ExcelUtil.setCellStringValueCenter(header, 1, "Month");
+        ExcelUtil.setCellStringValueCenter(header, 2, "Day");
+        ExcelUtil.setCellStringValueCenter(header, 3, "Type");
         ExcelUtil.setCellStringValue(header, 4, "Description");
         ExcelUtil.setCellStringValue(header, 5, "Out");
         ExcelUtil.setCellStringValue(header, 6, "In");
@@ -281,12 +281,12 @@ public class BSPEngine {
                 row = sheet.createRow(rowIndex);
                 ExcelUtil.setCellDateValue(row, 0, t.getDate());
                 ExcelUtil.setCellMonthValue(row, 1, t.getDate());
-                ExcelUtil.setCellNumericValue(row, 2, t.getDate().getDayOfMonth());
-                ExcelUtil.setCellStringValue(row, 3, "");
+                ExcelUtil.setCellDayValue(row, 2, t.getDate().getDayOfMonth());
+                ExcelUtil.setCellStringValueCenter(row, 3, "");
                 ExcelUtil.setCellStringValue(row, 4, t.getDescription());
-                ExcelUtil.setCellNumericValue(row, 5, t.getOut());
-                ExcelUtil.setCellNumericValue(row, 6, t.getIn());
-                ExcelUtil.setCellNumericValue(row, 7, t.getBalance());
+                ExcelUtil.setCellAmountValue(row, 5, t.getOut());
+                ExcelUtil.setCellAmountValue(row, 6, t.getIn());
+                ExcelUtil.setCellAmountValue(row, 7, t.getBalance());
                 rowIndex++;
             }
 
@@ -310,10 +310,10 @@ public class BSPEngine {
     private MonthlySummary addSummayToSheet(Sheet sheet, LocalDate month, int rowStart, int rowEnd) {
         // Add summary to excel sheet
         Row row = sheet.createRow(rowEnd);
-        ExcelUtil.setCellStringValue(row, 0, "");
+        ExcelUtil.setCellStringValueCenter(row, 0, "");
         ExcelUtil.setCellMonthValue(row, 1, month);
-        ExcelUtil.setCellStringValue(row, 2, "");
-        ExcelUtil.setCellStringValue(row, 3, "");
+        ExcelUtil.setCellStringValueCenter(row, 2, "");
+        ExcelUtil.setCellStringValueCenter(row, 3, "");
         ExcelUtil.setCellStringValue(row, 4, "");
         ExcelUtil.setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
         ExcelUtil.setCellFormula(row, 6, "sum(G" + rowStart + ":G" + rowEnd + ")");

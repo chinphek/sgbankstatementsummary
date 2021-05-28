@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellUtil;
@@ -56,6 +57,16 @@ public class ExcelUtil {
         short dataFormat = excel.createDataFormat().getFormat("MMM-yy");
         CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dataFormat);
         CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+    }
+
+    public static void setCellDayValue(Row row, int col, int value) {
+        Cell cell = row.createCell(col, CellType.NUMERIC);
+        cell.setCellValue(value);
+
+        Workbook excel = row.getSheet().getWorkbook();
+        CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
     }
 
     public static void setCellDateValue(Row row, int col, LocalDate value) {
@@ -68,6 +79,7 @@ public class ExcelUtil {
         short dataFormat = excel.createDataFormat().getFormat("dd-MMM-yyyy");
         CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dataFormat);
         CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
     }
 
     public static void setCellStringValue(Row row, int col, String value) {
@@ -78,12 +90,22 @@ public class ExcelUtil {
         CellUtil.setFont(cell, getFont(excel));
     }
 
-    public static void setCellNumericValue(Row row, int col, double value) {
+    public static void setCellStringValueCenter(Row row, int col, String value) {
+        Cell cell = row.createCell(col, CellType.STRING);
+        cell.setCellValue(value);
+
+        Workbook excel = row.getSheet().getWorkbook();
+        CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+    }
+
+    public static void setCellAmountValue(Row row, int col, double value) {
         Cell cell = row.createCell(col, CellType.NUMERIC);
         cell.setCellValue(value);
 
         Workbook excel = row.getSheet().getWorkbook();
         CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, excel.createDataFormat().getFormat("0.00"));
     }
 
     public static void setCellFormula(Row row, int col, String formula) {
@@ -91,6 +113,7 @@ public class ExcelUtil {
         cell.setCellFormula(formula);
         Workbook excel = row.getSheet().getWorkbook();
         CellUtil.setFont(cell, getFont(excel));
+        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, excel.createDataFormat().getFormat("0.00"));
 
         // Evaluate formula
         FormulaEvaluator e = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
