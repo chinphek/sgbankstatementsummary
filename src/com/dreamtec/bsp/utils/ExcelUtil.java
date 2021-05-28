@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -13,130 +14,159 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellUtil;
 
 public class ExcelUtil {
-    /**
-     * Get font object from excel Workbook.
-     * Create font object if necessary.
-     * This is necessary to prevent excel from repeatly creating and storing
-     * the same font, which increases the filesize.
-     * 
-     * @param excel
-     * @return
-     */
-    public static Font getFont(Workbook excel) {
-        boolean bold = false;
-        short color = Font.COLOR_NORMAL;
-        short fontHeight = 8*20;
-        String name = "Courier New";
-        boolean italic = false;
-        boolean strikeout = false;
-        short typeOffset = Font.SS_NONE;
-        byte underline = Font.U_NONE;
-        Font font = excel.findFont(bold, color, fontHeight, name, italic, strikeout, typeOffset, underline);
-        if(font == null) {
-            font = excel.createFont();
-            font.setBold(bold);
-            font.setColor(color);
-            font.setFontHeight(fontHeight);
-            font.setFontName(name);
-            font.setItalic(italic);
-            font.setStrikeout(strikeout);
-            font.setTypeOffset(typeOffset);
-            font.setUnderline(underline);
-        }
+    private Font font = null;
+    private CellStyle styleMonth = null;
+    private CellStyle styleDay = null;
+    private CellStyle styleDate = null;
+    private CellStyle styleAmount = null;
+    private CellStyle styleString = null;
+    private CellStyle styleStringCenter = null;
 
-        return font;
+    public ExcelUtil(Workbook excel) {
+        font = getFont2(excel);
+        styleMonth = getStyleMonth(excel);
+        styleDay = getStyleDay(excel);
+        styleDate = getStyleDate(excel);
+        styleAmount = getStyleAmount(excel);
+        styleString = getStyleString(excel);
+        styleStringCenter = getStyleStringCenter(excel);
     }
 
-    public static void setCellMonthValue(Row row, int col, LocalDate value) {
+    private Font getFont2(Workbook excel) {
+        Font f = excel.createFont();
+        f.setBold(false);
+        f.setColor(Font.COLOR_NORMAL);
+        f.setFontHeight((short)(8*20));
+        f.setFontName("Courier New");
+        f.setItalic(false);
+        f.setStrikeout(false);
+        f.setTypeOffset(Font.SS_NONE);
+        f.setUnderline(Font.U_NONE);
+        return f;
+    }
+
+    private CellStyle getStyleMonth(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        s.setAlignment(HorizontalAlignment.CENTER);
+        s.setDataFormat(excel.createDataFormat().getFormat("MMM-yy"));
+        return s;
+    }
+
+    private CellStyle getStyleDay(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        s.setAlignment(HorizontalAlignment.CENTER);
+        return s;
+    }
+
+    private CellStyle getStyleDate(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        s.setAlignment(HorizontalAlignment.CENTER);
+        s.setDataFormat(excel.createDataFormat().getFormat("dd-MMM-yyyy"));
+        return s;
+    }
+
+    private CellStyle getStyleAmount(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        s.setDataFormat(excel.createDataFormat().getFormat("0.00"));
+        return s;
+    }
+
+    private CellStyle getStyleString(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        return s;
+    }
+
+    private CellStyle getStyleStringCenter(Workbook excel) {
+        CellStyle s = excel.createCellStyle();
+        s.setFont(font);
+        s.setAlignment(HorizontalAlignment.CENTER);
+        return s;
+    }
+
+    public void setCellMonthValue(Row row, int col, LocalDate value) {
         //Set value
         Cell cell = row.createCell(col, CellType.STRING);
         cell.setCellValue(value.withDayOfMonth(1));
         
         //Set style
-        Workbook excel = row.getSheet().getWorkbook();
-        short dataFormat = excel.createDataFormat().getFormat("MMM-yy");
-        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dataFormat);
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+        cell.setCellStyle(styleMonth);
     }
 
-    public static void setCellDayValue(Row row, int col, int value) {
+    public void setCellDayValue(Row row, int col, int value) {
+        //Set value
         Cell cell = row.createCell(col, CellType.NUMERIC);
         cell.setCellValue(value);
 
-        Workbook excel = row.getSheet().getWorkbook();
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+        //Set style
+        cell.setCellStyle(styleDay);
     }
 
-    public static void setCellDateValue(Row row, int col, LocalDate value) {
+    public void setCellDateValue(Row row, int col, LocalDate value) {
         //Set value
         Cell cell = row.createCell(col, CellType.STRING);
         cell.setCellValue(value);
 
         //Set style
-        Workbook excel = row.getSheet().getWorkbook();
-        short dataFormat = excel.createDataFormat().getFormat("dd-MMM-yyyy");
-        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dataFormat);
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+        cell.setCellStyle(styleDate);
     }
 
-    public static void setCellStringValue(Row row, int col, String value) {
+    public void setCellStringValue(Row row, int col, String value) {
+        //Set value
         Cell cell = row.createCell(col, CellType.STRING);
         cell.setCellValue(value);
 
-        Workbook excel = row.getSheet().getWorkbook();
-        CellUtil.setFont(cell, getFont(excel));
+        //Set style
+        cell.setCellStyle(styleString);
     }
 
-    public static void setCellStringValueCenter(Row row, int col, String value) {
+    public void setCellStringValueCenter(Row row, int col, String value) {
+        //Set value
         Cell cell = row.createCell(col, CellType.STRING);
         cell.setCellValue(value);
 
-        Workbook excel = row.getSheet().getWorkbook();
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
+        //Set style
+        cell.setCellStyle(styleStringCenter);
     }
 
-    public static void setCellAmountValue(Row row, int col, double value) {
+    public void setCellAmountValue(Row row, int col, double value) {
+        //Set value
         Cell cell = row.createCell(col, CellType.NUMERIC);
         cell.setCellValue(value);
 
-        Workbook excel = row.getSheet().getWorkbook();
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, excel.createDataFormat().getFormat("0.00"));
+        //Set style
+        cell.setCellStyle(styleAmount);
     }
 
-    public static void setCellFormula(Row row, int col, String formula) {
+    public void setCellFormula(Row row, int col, String formula) {
         Cell cell = row.createCell(col, CellType.FORMULA);
         cell.setCellFormula(formula);
-        Workbook excel = row.getSheet().getWorkbook();
-        CellUtil.setFont(cell, getFont(excel));
-        CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, excel.createDataFormat().getFormat("0.00"));
+
+        //Set style
+        cell.setCellStyle(styleAmount);
 
         // Evaluate formula
         FormulaEvaluator e = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
         e.evaluate(cell);
     }
 
-    public static void setSummaryRowBorders(Row row, int count) {
-        Workbook excel = row.getSheet().getWorkbook();
-            
+    public void setSummaryRowBorders(Row row, int count) {
         for(int i = 0; i < count; i++) {
             Cell cell = row.getCell(i);
             CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_TOP, BorderStyle.THIN);
             CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
-
-            CellUtil.setFont(cell, getFont(excel));
+            CellUtil.setFont(cell, font);
         }
     }
 
-    public static void setEmptyRowStyle(Row row, int count) {
-        Workbook excel = row.getSheet().getWorkbook();
+    public void setEmptyRowStyle(Row row, int count) {
         for(int i = 0; i < count; i++) {
             Cell cell = row.createCell(i);
-            CellUtil.setFont(cell, getFont(excel));
+            cell.setCellStyle(styleString);
         }
     }
     

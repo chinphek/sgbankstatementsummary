@@ -30,7 +30,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class BSPEngine {
     private final Workbook excel = new XSSFWorkbook();
+    private final ExcelUtil excelUtil;
     private final List<IBankStatement> statements = new ArrayList<IBankStatement>();
+
+    public BSPEngine() {
+        excelUtil = new ExcelUtil(excel);
+    }
 
     /**
      * Add file into engine.<br>
@@ -101,7 +106,7 @@ public class BSPEngine {
         }
 
         //Add summary sheet
-        SummarySheetHelper.addSummarySheetToWorkbook(excel, listSummaries);
+        SummarySheetHelper.addSummarySheetToWorkbook(excel, excelUtil, listSummaries);
     }
 
     /**
@@ -228,14 +233,14 @@ public class BSPEngine {
         Sheet sheet = excel.createSheet(sheetName);
 
         Row header = sheet.createRow(0);
-        ExcelUtil.setCellStringValueCenter(header, 0, "Date");
-        ExcelUtil.setCellStringValueCenter(header, 1, "Month");
-        ExcelUtil.setCellStringValueCenter(header, 2, "Day");
-        ExcelUtil.setCellStringValueCenter(header, 3, "Type");
-        ExcelUtil.setCellStringValue(header, 4, "Description");
-        ExcelUtil.setCellStringValue(header, 5, "Out");
-        ExcelUtil.setCellStringValue(header, 6, "In");
-        ExcelUtil.setCellStringValue(header, 7, "Balance");
+        excelUtil.setCellStringValueCenter(header, 0, "Date");
+        excelUtil.setCellStringValueCenter(header, 1, "Month");
+        excelUtil.setCellStringValueCenter(header, 2, "Day");
+        excelUtil.setCellStringValueCenter(header, 3, "Type");
+        excelUtil.setCellStringValue(header, 4, "Description");
+        excelUtil.setCellStringValue(header, 5, "Out");
+        excelUtil.setCellStringValue(header, 6, "In");
+        excelUtil.setCellStringValue(header, 7, "Balance");
 
         if (transactions != null) {
             Collections.sort(transactions);
@@ -244,12 +249,12 @@ public class BSPEngine {
 
             // Add empty row
             Row row = sheet.createRow(rowIndex);
-            ExcelUtil.setEmptyRowStyle(row, 8);
+            excelUtil.setEmptyRowStyle(row, 8);
             rowIndex ++;
 
             // Add empty row
             row = sheet.createRow(rowIndex);
-            ExcelUtil.setEmptyRowStyle(row, 8);
+            excelUtil.setEmptyRowStyle(row, 8);
             rowIndex ++;
 
             LocalDate curMonth = null;
@@ -270,7 +275,7 @@ public class BSPEngine {
 
                     // Add empty row
                     row = sheet.createRow(rowIndex);
-                    ExcelUtil.setEmptyRowStyle(row, 8);
+                    excelUtil.setEmptyRowStyle(row, 8);
                     rowIndex ++;
                     
                     curMonth = month;
@@ -279,14 +284,14 @@ public class BSPEngine {
 
                 // Add 1 row of transaction
                 row = sheet.createRow(rowIndex);
-                ExcelUtil.setCellDateValue(row, 0, t.getDate());
-                ExcelUtil.setCellMonthValue(row, 1, t.getDate());
-                ExcelUtil.setCellDayValue(row, 2, t.getDate().getDayOfMonth());
-                ExcelUtil.setCellStringValueCenter(row, 3, "");
-                ExcelUtil.setCellStringValue(row, 4, t.getDescription());
-                ExcelUtil.setCellAmountValue(row, 5, t.getOut());
-                ExcelUtil.setCellAmountValue(row, 6, t.getIn());
-                ExcelUtil.setCellAmountValue(row, 7, t.getBalance());
+                excelUtil.setCellDateValue(row, 0, t.getDate());
+                excelUtil.setCellMonthValue(row, 1, t.getDate());
+                excelUtil.setCellDayValue(row, 2, t.getDate().getDayOfMonth());
+                excelUtil.setCellStringValueCenter(row, 3, "");
+                excelUtil.setCellStringValue(row, 4, t.getDescription());
+                excelUtil.setCellAmountValue(row, 5, t.getOut());
+                excelUtil.setCellAmountValue(row, 6, t.getIn());
+                excelUtil.setCellAmountValue(row, 7, t.getBalance());
                 rowIndex++;
             }
 
@@ -310,15 +315,15 @@ public class BSPEngine {
     private MonthlySummary addSummayToSheet(Sheet sheet, LocalDate month, int rowStart, int rowEnd) {
         // Add summary to excel sheet
         Row row = sheet.createRow(rowEnd);
-        ExcelUtil.setCellStringValueCenter(row, 0, "");
-        ExcelUtil.setCellMonthValue(row, 1, month);
-        ExcelUtil.setCellStringValueCenter(row, 2, "");
-        ExcelUtil.setCellStringValueCenter(row, 3, "");
-        ExcelUtil.setCellStringValue(row, 4, "");
-        ExcelUtil.setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
-        ExcelUtil.setCellFormula(row, 6, "sum(G" + rowStart + ":G" + rowEnd + ")");
-        ExcelUtil.setCellFormula(row, 7, "H" + (rowStart - 2) + "-F" + (rowEnd + 1) + "+G" + (rowEnd + 1));
-        ExcelUtil.setSummaryRowBorders(row, 8);
+        excelUtil.setCellStringValueCenter(row, 0, "");
+        excelUtil.setCellMonthValue(row, 1, month);
+        excelUtil.setCellStringValueCenter(row, 2, "");
+        excelUtil.setCellStringValueCenter(row, 3, "");
+        excelUtil.setCellStringValue(row, 4, "");
+        excelUtil.setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
+        excelUtil.setCellFormula(row, 6, "sum(G" + rowStart + ":G" + rowEnd + ")");
+        excelUtil.setCellFormula(row, 7, "H" + (rowStart - 2) + "-F" + (rowEnd + 1) + "+G" + (rowEnd + 1));
+        excelUtil.setSummaryRowBorders(row, 8);
 
         // return MonthlySummary object that contains reference to the above summary
         MonthlySummary s = new MonthlySummary();

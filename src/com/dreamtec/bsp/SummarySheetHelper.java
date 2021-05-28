@@ -21,7 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public class SummarySheetHelper {
 
-    public static void addSummarySheetToWorkbook(Workbook excel, List<MonthlySummary> list) {
+    public static void addSummarySheetToWorkbook(Workbook excel, ExcelUtil excelUtil,  List<MonthlySummary> list) {
         System.out.print("        Preparing summary sheet");
 
         // Create the 'Summary' sheet
@@ -32,9 +32,9 @@ public class SummarySheetHelper {
 
         // Add headers
         Row header = sheet.createRow(0);
-        ExcelUtil.setCellStringValue(header, 1, "OUT");
-        ExcelUtil.setCellStringValue(header, 2, "IN");
-        ExcelUtil.setCellStringValue(header, 3, "BALANCE");
+        excelUtil.setCellStringValue(header, 1, "OUT");
+        excelUtil.setCellStringValue(header, 2, "IN");
+        excelUtil.setCellStringValue(header, 3, "BALANCE");
 
         // Sort the list chronologically
         Collections.sort(list);
@@ -51,22 +51,22 @@ public class SummarySheetHelper {
         for(Entry<LocalDate, Map<String, MonthlySummary>> e1 : summary.entrySet()) {
             for(Entry<String, MonthlySummary> e2 : e1.getValue().entrySet()) {
                 Row row = sheet.createRow(rowIndex++);
-                ExcelUtil.setCellStringValue(row, 0, e2.getKey());
+                excelUtil.setCellStringValue(row, 0, e2.getKey());
 
                 MonthlySummary s = e2.getValue();
                 if (s != null) {
-                    ExcelUtil.setCellFormula(row, 1, s.getRefOut());
-                    ExcelUtil.setCellFormula(row, 2, s.getRefIn());
-                    ExcelUtil.setCellFormula(row, 3, s.getRefBalance());
+                    excelUtil.setCellFormula(row, 1, s.getRefOut());
+                    excelUtil.setCellFormula(row, 2, s.getRefIn());
+                    excelUtil.setCellFormula(row, 3, s.getRefBalance());
                 }
             }
 
             Row row = sheet.createRow(rowIndex++);
-            ExcelUtil.setCellMonthValue(row, 0, e1.getKey());
-            ExcelUtil.setCellFormula(row, 1, "sum(B" + (rowIndex - accounts.size()) + ":B" + (rowIndex - 1) + ")");
-            ExcelUtil.setCellFormula(row, 2, "sum(C" + (rowIndex - accounts.size()) + ":C" + (rowIndex - 1) + ")");
-            ExcelUtil.setCellFormula(row, 3, "sum(D" + (rowIndex - accounts.size()) + ":D" + (rowIndex - 1) + ")");
-            ExcelUtil.setSummaryRowBorders(row, 4);
+            excelUtil.setCellMonthValue(row, 0, e1.getKey());
+            excelUtil.setCellFormula(row, 1, "sum(B" + (rowIndex - accounts.size()) + ":B" + (rowIndex - 1) + ")");
+            excelUtil.setCellFormula(row, 2, "sum(C" + (rowIndex - accounts.size()) + ":C" + (rowIndex - 1) + ")");
+            excelUtil.setCellFormula(row, 3, "sum(D" + (rowIndex - accounts.size()) + ":D" + (rowIndex - 1) + ")");
+            excelUtil.setSummaryRowBorders(row, 4);
 
             rowIndex++;
         }
