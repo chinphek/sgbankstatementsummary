@@ -18,8 +18,6 @@ import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
 import com.dreamtec.bsp.utils.ExcelUtil;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -230,13 +228,14 @@ public class BSPEngine {
         Sheet sheet = excel.createSheet(sheetName);
 
         Row header = sheet.createRow(0);
-        ExcelUtil.setCellStringValue(header, 0, "Month");
-        ExcelUtil.setCellStringValue(header, 1, "Day");
-        ExcelUtil.setCellStringValue(header, 2, "Date");
-        ExcelUtil.setCellStringValue(header, 3, "Description");
-        ExcelUtil.setCellStringValue(header, 4, "Out");
-        ExcelUtil.setCellStringValue(header, 5, "In");
-        ExcelUtil.setCellStringValue(header, 6, "Balance");
+        ExcelUtil.setCellStringValue(header, 0, "Date");
+        ExcelUtil.setCellStringValue(header, 1, "Month");
+        ExcelUtil.setCellStringValue(header, 2, "Day");
+        ExcelUtil.setCellStringValue(header, 3, "Type");
+        ExcelUtil.setCellStringValue(header, 4, "Description");
+        ExcelUtil.setCellStringValue(header, 5, "Out");
+        ExcelUtil.setCellStringValue(header, 6, "In");
+        ExcelUtil.setCellStringValue(header, 7, "Balance");
 
         if (transactions != null) {
             Collections.sort(transactions);
@@ -245,12 +244,12 @@ public class BSPEngine {
 
             // Add empty row
             Row row = sheet.createRow(rowIndex);
-            ExcelUtil.setEmptyRowStyle(row, 7);
+            ExcelUtil.setEmptyRowStyle(row, 8);
             rowIndex ++;
 
             // Add empty row
             row = sheet.createRow(rowIndex);
-            ExcelUtil.setEmptyRowStyle(row, 7);
+            ExcelUtil.setEmptyRowStyle(row, 8);
             rowIndex ++;
 
             LocalDate curMonth = null;
@@ -271,7 +270,7 @@ public class BSPEngine {
 
                     // Add empty row
                     row = sheet.createRow(rowIndex);
-                    ExcelUtil.setEmptyRowStyle(row, 7);
+                    ExcelUtil.setEmptyRowStyle(row, 8);
                     rowIndex ++;
                     
                     curMonth = month;
@@ -280,13 +279,14 @@ public class BSPEngine {
 
                 // Add 1 row of transaction
                 row = sheet.createRow(rowIndex);
-                ExcelUtil.setCellMonthValue(row, 0, t.getDate());
-                ExcelUtil.setCellNumericValue(row, 1, t.getDate().getDayOfMonth());
-                ExcelUtil.setCellDateValue(row, 2, t.getDate());
-                ExcelUtil.setCellStringValue(row, 3, t.getDescription());
-                ExcelUtil.setCellNumericValue(row, 4, t.getOut());
-                ExcelUtil.setCellNumericValue(row, 5, t.getIn());
-                ExcelUtil.setCellNumericValue(row, 6, t.getBalance());
+                ExcelUtil.setCellDateValue(row, 0, t.getDate());
+                ExcelUtil.setCellMonthValue(row, 1, t.getDate());
+                ExcelUtil.setCellNumericValue(row, 2, t.getDate().getDayOfMonth());
+                ExcelUtil.setCellStringValue(row, 3, "");
+                ExcelUtil.setCellStringValue(row, 4, t.getDescription());
+                ExcelUtil.setCellNumericValue(row, 5, t.getOut());
+                ExcelUtil.setCellNumericValue(row, 6, t.getIn());
+                ExcelUtil.setCellNumericValue(row, 7, t.getBalance());
                 rowIndex++;
             }
 
@@ -295,17 +295,6 @@ public class BSPEngine {
             listSummaries.add(s);
         }
 
-        //Default syle
-        CellStyle style1 = excel.createCellStyle();
-        style1.setFont(ExcelUtil.getFont(excel));
-        style1.setAlignment(HorizontalAlignment.CENTER);
-        sheet.setDefaultColumnStyle(1, style1);
-
-        CellStyle style3 = excel.createCellStyle();
-        style3.setFont(ExcelUtil.getFont(excel));
-        style3.setAlignment(HorizontalAlignment.CENTER);
-        sheet.setDefaultColumnStyle(3, style3);
-
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);
         sheet.autoSizeColumn(2);
@@ -313,6 +302,7 @@ public class BSPEngine {
         sheet.autoSizeColumn(4);
         sheet.autoSizeColumn(5);
         sheet.autoSizeColumn(6);
+        sheet.autoSizeColumn(7);
 
         return listSummaries;
     }
@@ -320,22 +310,23 @@ public class BSPEngine {
     private MonthlySummary addSummayToSheet(Sheet sheet, LocalDate month, int rowStart, int rowEnd) {
         // Add summary to excel sheet
         Row row = sheet.createRow(rowEnd);
-        ExcelUtil.setCellMonthValue(row, 0, month);
-        ExcelUtil.setCellStringValue(row, 1, "");
+        ExcelUtil.setCellStringValue(row, 0, "");
+        ExcelUtil.setCellMonthValue(row, 1, month);
         ExcelUtil.setCellStringValue(row, 2, "");
         ExcelUtil.setCellStringValue(row, 3, "");
-        ExcelUtil.setCellFormula(row, 4, "sum(E" + rowStart + ":E" + rowEnd + ")");
+        ExcelUtil.setCellStringValue(row, 4, "");
         ExcelUtil.setCellFormula(row, 5, "sum(F" + rowStart + ":F" + rowEnd + ")");
-        ExcelUtil.setCellFormula(row, 6, "G" + (rowStart - 2) + "-E" + (rowEnd + 1) + "+F" + (rowEnd + 1));
-        ExcelUtil.setSummaryRowBorders(row, 7);
+        ExcelUtil.setCellFormula(row, 6, "sum(G" + rowStart + ":G" + rowEnd + ")");
+        ExcelUtil.setCellFormula(row, 7, "H" + (rowStart - 2) + "-F" + (rowEnd + 1) + "+G" + (rowEnd + 1));
+        ExcelUtil.setSummaryRowBorders(row, 8);
 
         // return MonthlySummary object that contains reference to the above summary
         MonthlySummary s = new MonthlySummary();
         s.setAccountKey(sheet.getSheetName());
         s.setMonth(month);
-        s.setRefOut("'" + sheet.getSheetName() + "'!E" + (rowEnd + 1));
-        s.setRefIn("'" + sheet.getSheetName() + "'!F" + (rowEnd + 1));
-        s.setRefBalance("'" + sheet.getSheetName() + "'!G" + (rowEnd + 1));
+        s.setRefOut("'" + sheet.getSheetName() + "'!F" + (rowEnd + 1));
+        s.setRefIn("'" + sheet.getSheetName() + "'!G" + (rowEnd + 1));
+        s.setRefBalance("'" + sheet.getSheetName() + "'!H" + (rowEnd + 1));
         return s;
     }
 }
