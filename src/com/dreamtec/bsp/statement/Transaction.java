@@ -11,12 +11,12 @@ import java.time.format.DateTimeFormatter;
 public class Transaction implements Comparable<Transaction> {
 	DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
-	private String accountKey;
-    private LocalDate date;
-    private String description;
-    private double out;
-    private double in;
-	private double balance;
+	private String accountKey = null;
+    private LocalDate date = null;
+    private String description = null;
+    private Double out = null;
+    private Double in = null;
+	private Double balance = null;
 	
 	@Override
 	public String toString() {
@@ -52,27 +52,27 @@ public class Transaction implements Comparable<Transaction> {
 		this.description = description;
 	}
 
-	public double getOut() {
+	public Double getOut() {
 		return out;
 	}
 
-	public void setOut(double out) {
+	public void setOut(Double out) {
 		this.out = out;
 	}
 
-	public double getIn() {
+	public Double getIn() {
 		return in;
 	}
 
-	public void setIn(double in) {
+	public void setIn(Double in) {
 		this.in = in;
 	}
 
-	public double getBalance() {
+	public Double getBalance() {
 		return balance;
 	}
 
-	public void setBalance(double balance) {
+	public void setBalance(Double balance) {
 		this.balance = balance;
 	}
 

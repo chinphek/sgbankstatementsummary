@@ -251,6 +251,8 @@ public class BSPEngine {
             // Add empty row
             Row row = sheet.createRow(rowIndex);
             excelUtil.setEmptyRowStyle(row, 8);
+            excelUtil.setCellStringValue(row, 4, "Balance from previous statements. Replace 0 with amount, in the box to the right ===>");
+            excelUtil.setCellAmountValue(row, 7, Double.valueOf(0));
             rowIndex ++;
 
             // Add empty row
@@ -285,6 +287,7 @@ public class BSPEngine {
 
                 // Add 1 row of transaction
                 row = sheet.createRow(rowIndex);
+                rowIndex++;
                 excelUtil.setCellDateValue(row, 0, t.getDate());
                 excelUtil.setCellMonthValue(row, 1, t.getDate());
                 excelUtil.setCellDayValue(row, 2, t.getDate().getDayOfMonth());
@@ -292,8 +295,15 @@ public class BSPEngine {
                 excelUtil.setCellStringValue(row, 4, t.getDescription());
                 excelUtil.setCellAmountValue(row, 5, t.getOut());
                 excelUtil.setCellAmountValue(row, 6, t.getIn());
-                excelUtil.setCellAmountValue(row, 7, t.getBalance());
-                rowIndex++;
+                if(t.getBalance() == null) {
+                    if(rowIndex == rowIndexCurMonth) {
+                        excelUtil.setCellFormula(row, 7, "H" + (rowIndex - 2) + "+G" + rowIndex + "-F" + rowIndex);
+                    } else {
+                        excelUtil.setCellFormula(row, 7, "H" + (rowIndex - 1) + "+G" + rowIndex + "-F" + rowIndex);
+                    }
+                } else {
+                    excelUtil.setCellAmountValue(row, 7, t.getBalance());
+                }
             }
 
             //Summarizes the transactions for the current month.

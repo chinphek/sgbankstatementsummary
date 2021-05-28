@@ -132,10 +132,14 @@ public class ExcelUtil {
         cell.setCellStyle(styleStringCenter);
     }
 
-    public void setCellAmountValue(Row row, int col, double value) {
+    public void setCellAmountValue(Row row, int col, Double value) {
         //Set value
         Cell cell = row.createCell(col, CellType.NUMERIC);
-        cell.setCellValue(value);
+        if(value == null) {
+            cell.setCellValue("");
+        } else {
+            cell.setCellValue(value);
+        }
 
         //Set style
         cell.setCellStyle(styleAmount);
