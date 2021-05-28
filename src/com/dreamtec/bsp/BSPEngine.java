@@ -18,6 +18,8 @@ import com.dreamtec.bsp.statement.IBankStatement;
 import com.dreamtec.bsp.statement.Transaction;
 import com.dreamtec.bsp.utils.ExcelUtil;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -226,6 +228,7 @@ public class BSPEngine {
         List<MonthlySummary> listSummaries = new ArrayList<MonthlySummary>();
 
         Sheet sheet = excel.createSheet(sheetName);
+
         Row header = sheet.createRow(0);
         ExcelUtil.setCellStringValue(header, 0, "Month");
         ExcelUtil.setCellStringValue(header, 1, "Day");
@@ -238,7 +241,18 @@ public class BSPEngine {
         if (transactions != null) {
             Collections.sort(transactions);
 
-            int rowIndex = 3;
+            int rowIndex = 1;
+
+            // Add empty row
+            Row row = sheet.createRow(rowIndex);
+            ExcelUtil.setEmptyRowStyle(row, 7);
+            rowIndex ++;
+
+            // Add empty row
+            row = sheet.createRow(rowIndex);
+            ExcelUtil.setEmptyRowStyle(row, 7);
+            rowIndex ++;
+
             LocalDate curMonth = null;
             int rowIndexCurMonth = -1;
             for (int i = 0; i < transactions.size(); i++) {
@@ -253,14 +267,19 @@ public class BSPEngine {
                     //Summarizes the transactions for the current month.
                     MonthlySummary s = addSummayToSheet(sheet, curMonth, rowIndexCurMonth, rowIndex);
                     listSummaries.add(s);
+                    rowIndex++;
+
+                    // Add empty row
+                    row = sheet.createRow(rowIndex);
+                    ExcelUtil.setEmptyRowStyle(row, 7);
+                    rowIndex ++;
                     
-                    rowIndex += 2;
                     curMonth = month;
                     rowIndexCurMonth = rowIndex + 1;
                 }
 
                 // Add 1 row of transaction
-                Row row = sheet.createRow(rowIndex);
+                row = sheet.createRow(rowIndex);
                 ExcelUtil.setCellMonthValue(row, 0, t.getDate());
                 ExcelUtil.setCellNumericValue(row, 1, t.getDate().getDayOfMonth());
                 ExcelUtil.setCellDateValue(row, 2, t.getDate());
@@ -275,6 +294,17 @@ public class BSPEngine {
             MonthlySummary s = addSummayToSheet(sheet, curMonth, rowIndexCurMonth, rowIndex);
             listSummaries.add(s);
         }
+
+        //Default syle
+        CellStyle style1 = excel.createCellStyle();
+        style1.setFont(ExcelUtil.getFont(excel));
+        style1.setAlignment(HorizontalAlignment.CENTER);
+        sheet.setDefaultColumnStyle(1, style1);
+
+        CellStyle style3 = excel.createCellStyle();
+        style3.setFont(ExcelUtil.getFont(excel));
+        style3.setAlignment(HorizontalAlignment.CENTER);
+        sheet.setDefaultColumnStyle(3, style3);
 
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);
