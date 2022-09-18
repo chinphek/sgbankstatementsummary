@@ -40,6 +40,10 @@ public abstract class AbstractBankStatement implements IBankStatement {
         processFileHeader();
 
         List<Transaction> list = new ArrayList<>();
+
+        //--if (file.getName().equals("OCBC 2022-06.csv")) {
+        //--    System.out.println("Debugging " + file.getName());
+        //--}
         
         System.out.println("            Processing file " + file.getName());
         System.out.println("                Account Name: " + accountName);

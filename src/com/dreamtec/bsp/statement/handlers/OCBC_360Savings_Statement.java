@@ -38,7 +38,13 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
             br = new BufferedReader(new FileReader(file));
 
             line = br.readLine();
-            accountNumber = line.substring(33);
+            if(line.startsWith("\'")) {
+                // 2022-09-18: OCBC 360 csv statement contains an additional prefix of "'"
+                accountNumber = line.substring(35);
+            } else {
+                accountNumber = line.substring(33);
+            }
+            
 
             while((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);

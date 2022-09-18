@@ -43,6 +43,7 @@ public class Utils {
         try {
             return LocalDate.parse(dateStr, dateFormatter);
         } catch (DateTimeParseException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -66,6 +67,9 @@ public class Utils {
             char c = s.charAt(i);
             if(c == '"') {
                 esc = !esc;
+            } else if(c == '\'') {
+                // 2022-09-18: OCBC 360 csv statement contains an additional prefix of "'"
+                continue;
             } else {
                 if(esc) {
                     sb.append(c);

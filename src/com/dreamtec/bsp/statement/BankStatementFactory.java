@@ -23,13 +23,17 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 public class BankStatementFactory {
 
     public static IBankStatement getHandler(final File file) {
+        //--if(file.getName().equals("OCBC 2022-06.csv")) {
+        //--    System.out.println("Debugging " + file.getName());
+        //--}
+
         if (file.getName().endsWith(".csv")) {
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new FileReader(file)); // creates a buffering character input stream
                 final String line = br.readLine();
                 // System.out.println(line);
-                if (line.contains("Account details for:,360 Account")) {
+                if (line.contains("360 Account")) {
                     return new OCBC_360Savings_Statement(file);
                 } else if (line.contains("Account details for:,OCBC 365 Credit Card")) {
                     return new OCBC_365CreditCard_Statement(file);
