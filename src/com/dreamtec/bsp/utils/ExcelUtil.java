@@ -70,7 +70,7 @@ public class ExcelUtil {
     private CellStyle getStyleAmount(Workbook excel) {
         CellStyle s = excel.createCellStyle();
         s.setFont(font);
-        s.setDataFormat(excel.createDataFormat().getFormat("0.00"));
+        s.setDataFormat(excel.createDataFormat().getFormat("#,##0.00"));
         return s;
     }
 
