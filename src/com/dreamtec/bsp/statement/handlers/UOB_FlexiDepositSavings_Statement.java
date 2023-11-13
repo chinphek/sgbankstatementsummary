@@ -26,6 +26,38 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
         super(file);
     }
 
+     /**
+     * Checks whether input file is UOB Flexi Deposit Savings account statement.
+     * 
+     * @param file
+     * @return
+     */
+    public static boolean isThisType(File file) {
+        FileInputStream stream = null;
+        try {
+            stream = new FileInputStream(file);
+            Workbook wb = WorkbookFactory.create(stream);
+            
+            if(Utils.workbookStringValue(wb, 0, 0, 0).startsWith("United Overseas Bank Limited.")) {
+                if(Utils.workbookStringValue(wb, 0, 5, 1).equals("FlexiDeposit")) {
+                    return true;
+                }
+            }
+        } catch (final Exception e) {
+            // do nothing
+        } finally {
+            if(stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return false;
+    }
+
     @Override
     protected void processFileHeader() {
         accountName = ConsoleColors.BLUE_BRIGHT + "UOB FlexiDeposit Savings" + ConsoleColors.RESET;

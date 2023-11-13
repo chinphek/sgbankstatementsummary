@@ -28,6 +28,35 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
         super(file);
     }
 
+    /**
+     * Checks whether input file is OCBC 360 Savings account statement.
+     * 
+     * @param file
+     * @return
+     */
+    public static boolean isThisType(File file) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(file)); // creates a buffering character input stream
+            final String line = br.readLine();
+            if (line.contains("360 Account")) {
+                return true;
+            }
+        } catch (final Exception e) {
+            // do nothing
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Override
     protected void processFileHeader() {
         accountName = ConsoleColors.RED_BRIGHT + "OCBC 360 Savings" + ConsoleColors.RESET;
