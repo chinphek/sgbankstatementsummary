@@ -84,7 +84,7 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
         try {
             while ((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
-                if (cells.length > 1 && Utils.isDate(cells[1], "dd/MM/uuuu")) {
+                if (cells.length > 1 && Utils.isDate(cells[1], DATE_FORMAT)) {
                     break;
                 } else if(cells.length > 2) {
                     t.setDescription(t.getDescription() + " " + cells[2]);

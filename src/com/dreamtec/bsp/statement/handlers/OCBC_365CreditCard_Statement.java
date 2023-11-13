@@ -77,7 +77,7 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
         try {
             while ((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
-                if (cells.length > 0 && Utils.isDate(cells[0], "dd/MM/uuuu")) {
+                if (cells.length > 0 && Utils.isDate(cells[0], DATE_FORMAT)) {
                     break;
                 }
             }
