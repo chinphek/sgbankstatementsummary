@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import com.dreamtec.bsp.statement.handlers.OCBC_360Savings_Statement;
 import com.dreamtec.bsp.statement.handlers.OCBC_365CreditCard_Statement;
+import com.dreamtec.bsp.statement.handlers.POSB_PassbookSavings_Statement;
 import com.dreamtec.bsp.statement.handlers.UOB_FlexiDepositSavings_Statement;
 import com.dreamtec.bsp.utils.Utils;
 
@@ -72,6 +73,12 @@ public class BankStatementFactory {
                         e.printStackTrace();
                     }
                 }
+            }
+        } else if(POSB_PassbookSavings_Statement.isThisType(file)) {
+            try {
+                return new POSB_PassbookSavings_Statement(file);
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
         }
 
