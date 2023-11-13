@@ -24,6 +24,10 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
     private String[] cells = null;
     private static final String DATE_FORMAT = "dd LLL uuuu";
 
+    public POSB_PassbookSavings_Statement(File file) throws FileNotFoundException {
+        super(file);
+    }
+
     /**
      * Checks whether input file is POSB Passbook Savings account statement.
      * 
@@ -55,10 +59,6 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
         }
         
         return false;
-    }
-
-    public POSB_PassbookSavings_Statement(File file) throws FileNotFoundException {
-        super(file);
     }
 
     @Override
