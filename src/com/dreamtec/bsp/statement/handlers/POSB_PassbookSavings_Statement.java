@@ -45,7 +45,8 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
             }
 
             String line = br.readLine();
-            return line.contains("Account Details For:,POSB Savings");
+            return line.contains("Account Details For:,POSB Savings")
+                || line.contains("Account Details For:,POSB Passbook Savings Account");
         } catch (final Exception e) {
             // do nothing
         } finally {
@@ -76,7 +77,11 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
             }
 
             line = br.readLine();
-            accountNumber = line.substring(34);
+            if (line.contains("Account Details For:,POSB Savings")) {
+                accountNumber = line.substring(34);
+            } else if (line.contains("Account Details For:,POSB Passbook Savings Account")) {
+                accountNumber = line.substring(51);
+            }
 
             while((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
