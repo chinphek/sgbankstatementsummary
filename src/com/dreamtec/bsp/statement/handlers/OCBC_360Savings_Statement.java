@@ -78,6 +78,12 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
             while((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
                 if(cells.length > 1 && Utils.isDate(cells[1], DATE_FORMAT)) {
+                    // 07-Sep-2024 OCBC changes the format of their CSV
+                    // It is now split into 2 lines. The cell length changed from 5 to 3
+                    if(cells.length == 3) {
+                        line += " " + br.readLine();
+                        cells = Utils.splitCSV(line);
+                    }
                     break;
                 }
             }
@@ -114,6 +120,12 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
             while ((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
                 if (cells.length > 1 && Utils.isDate(cells[1], DATE_FORMAT)) {
+                    // 07-Sep-2024 OCBC changes the format of their CSV
+                    // It is now split into 2 lines. The cell length changed from 5 to 3
+                    if(cells.length == 3) {
+                        line += " " + br.readLine();
+                        cells = Utils.splitCSV(line);
+                    }
                     break;
                 } else if(cells.length > 2) {
                     t.setDescription(t.getDescription() + " " + cells[2]);
