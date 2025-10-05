@@ -39,14 +39,14 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
         try {
             br = new BufferedReader(new FileReader(file)); // creates a buffering character input stream
 
-            // Skip the first 11 lines as they are blank
-            for(int i=0; i<11; i++) {
-                br.readLine();
+            String line;
+            while((line = br.readLine()) != null) {
+                if(line.contains("Account Details For:,POSB Savings")
+                || line.contains("Account Details For:,POSB Passbook Savings Account")) {
+                    return true;
+                }
             }
-
-            String line = br.readLine();
-            return line.contains("Account Details For:,POSB Savings")
-                || line.contains("Account Details For:,POSB Passbook Savings Account");
+            return false;
         } catch (final Exception e) {
             // do nothing
         } finally {
@@ -71,16 +71,15 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
             //Open the file for line by line reading
             br = new BufferedReader(new FileReader(file));
 
-            // Skip the first 11 lines as they are blank
-            for(int i=0; i<11; i++) {
-                br.readLine();
-            }
-
-            line = br.readLine();
-            if (line.contains("Account Details For:,POSB Savings")) {
-                accountNumber = line.substring(34);
-            } else if (line.contains("Account Details For:,POSB Passbook Savings Account")) {
-                accountNumber = line.substring(51);
+            while((line = br.readLine()) != null) {
+                if (line.contains("Account Details For:,POSB Savings")) {
+                    accountNumber = line.substring(34);
+                    break;
+                } else if (line.contains("Account Details For:,POSB Passbook Savings Account")) {
+                    accountNumber = line.substring(50);
+                    accountNumber = accountNumber.trim();
+                    break;
+                }
             }
 
             while((line = br.readLine()) != null) {
