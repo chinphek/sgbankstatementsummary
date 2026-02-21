@@ -22,6 +22,7 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
     private BufferedReader br = null;
     private String line = null;
     private String[] cells = null;
+    private int format = 0;
     private static final String DATE_FORMAT = "dd LLL uuuu";
 
     public POSB_PassbookSavings_Statement(File file) throws FileNotFoundException {
@@ -42,7 +43,9 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
             String line;
             while((line = br.readLine()) != null) {
                 if(line.contains("Account Details For:,POSB Savings")
-                || line.contains("Account Details For:,POSB Passbook Savings Account")) {
+                || line.contains("Account Details For:,POSB Passbook Savings Account")
+                || line.contains("Account Details For:\",\"POSB Passbook Savings Account")
+                ) {
                     return true;
                 }
             }
@@ -79,6 +82,10 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
                     accountNumber = line.substring(50);
                     accountNumber = accountNumber.trim();
                     break;
+                } else if (line.contains("Account Details For:\",\"POSB Passbook Savings Account")) {
+                    accountNumber = line.substring(54, 65);
+                    format = 1;
+                    break;
                 }
             }
 
@@ -105,14 +112,23 @@ public class POSB_PassbookSavings_Statement extends AbstractBankStatement {
         //[0]: Transaction date
         LocalDate date = Utils.toDate(cells[0], DATE_FORMAT);
         t.setDate(date);
-        //[1]: Reference, [4][5][6]: Transaction Ref1/2/3
-        t.setDescription(cells[1] + " " + cells[4] + " " + cells[5] + " " + cells[6]);
-        //[2]: Withdrawals (SGD)
-        String v2 = cells[2];
-        t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
-        //[3]: Deposits (SGD)
-        String v3 = cells[3];
-        t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+        if(format == 0) {
+            //[1]: Reference, [4][5][6]: Transaction Ref1/2/3
+            t.setDescription(cells[1] + " " + cells[4] + " " + cells[5] + " " + cells[6]);
+            //[2]: Withdrawals (SGD)
+            String v2 = cells[2];
+            t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
+            //[3]: Deposits (SGD)
+            String v3 = cells[3];
+            t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+        } else if(format == 1) {
+            t.setDescription(cells[1] + " " + cells[2]);
+            String v2 = cells[7];
+            t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
+            String v3 = cells[8];
+            t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+        }
+        
 
         try {
             while ((line = br.readLine()) != null) {
