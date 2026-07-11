@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 
 import com.dreamtec.bsp.statement.AbstractBankStatement;
 import com.dreamtec.bsp.statement.AccountType;
@@ -103,7 +105,7 @@ public class OCBC_360Savings_Statement extends AbstractBankStatement {
         Transaction t = new Transaction();
         //[0]: Transaction date
         //[1]: Value date
-        LocalDate date = Utils.toDate(cells[1], DATE_FORMAT);
+        LocalDate date = Collections.min(Arrays.asList(Utils.toDate(cells[0], DATE_FORMAT), Utils.toDate(cells[1], DATE_FORMAT)));
         t.setDate(date);
         //[2]: Description
         t.setDescription(cells[2]);
