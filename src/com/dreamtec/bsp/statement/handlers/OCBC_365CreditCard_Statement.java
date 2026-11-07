@@ -89,23 +89,33 @@ public class OCBC_365CreditCard_Statement extends AbstractBankStatement {
         }
 
         Transaction t = new Transaction();
-        //[0]: Transaction date
-        LocalDate date = Utils.toDate(cells[0], DATE_FORMAT);
-        t.setDate(date);
-        //[1]: Description
-        t.setDescription(cells[1]);
-        //[2]: Withdrawals (SGD)
-        String v2 = cells[2];
-        t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
-        //[3]: Deposits (SGD)
-        if(cells.length > 3) {
-            String v3 = cells[3];
-            t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
-        } 
+        try {
+            //[0]: Transaction date
+            LocalDate date = Utils.toDate(cells[0], DATE_FORMAT);
+            t.setDate(date);
+            //[1]: Description
+            t.setDescription(cells[1]);
+            //[2]: Withdrawals (SGD)
+            String v2 = cells[2];
+            t.setOut(v2 == null || v2.isBlank() ? 0 : Utils.toAmount(v2));
+            //[3]: Deposits (SGD)
+            if(cells.length > 3) {
+                String v3 = cells[3];
+                t.setIn(v3 == null || v3.isBlank() ? 0 : Utils.toAmount(v3));
+            }
+        } catch (Throwable e) {
+            System.out.println(line);
+            e.printStackTrace();
+            throw e;
+        }
         
         try {
             while ((line = br.readLine()) != null) {
                 cells = Utils.splitCSV(line);
+                if(cells.length < 3) {
+                    line += br.readLine();
+                    cells = Utils.splitCSV(line);
+                }
                 if (cells.length > 0 && Utils.isDate(cells[0], DATE_FORMAT)) {
                     break;
                 }

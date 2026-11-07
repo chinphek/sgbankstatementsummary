@@ -42,6 +42,9 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
                 if(Utils.workbookStringValue(wb, 0, 5, 1).equals("FlexiDeposit")) {
                     return true;
                 }
+                if(Utils.workbookStringValue(wb, 0, 4, 1).equals("FlexiDeposit")) {
+                    return true;
+                }
             }
         } catch (final Exception e) {
             // do nothing
@@ -67,7 +70,12 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
             stream = new FileInputStream(file);
             wb = WorkbookFactory.create(stream);
 
-            accountNumber = Utils.workbookStringValue(wb, 0, 4, 1);
+            int i=0;
+            while(!"Account Number:".equals(Utils.workbookStringValue(wb, 0, i, 0))) {
+                i++;
+            }
+            accountNumber = Utils.workbookStringValue(wb, 0, i, 1);
+
             sheet = 0;
             // For UOB, the latest transactions are at the top.
             // The first transaction is at the last row.
@@ -83,8 +91,7 @@ public class UOB_FlexiDepositSavings_Statement extends AbstractBankStatement {
 
     @Override
     protected Transaction getNextTransaction() {
-        // Row 8 is the latest transaction
-        if(row < 8) {
+        if(Utils.workbookStringValue(wb, sheet, row, 0).equals("Transaction Date")) {
             return null;
         }
 
